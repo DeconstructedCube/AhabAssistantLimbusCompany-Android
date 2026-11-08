@@ -2180,5 +2180,117 @@
         }
     },
     "github": "https://github.com/DeconstructedCube/AhabAssistantLimbusCompany-Android",
-    "description": "《边狱公司》日常采光、体力合成与全自动镜牢工具。"
+    "description": "《边狱公司》日常采光、体力合成与全自动镜牢工具。",
+    "preset": [
+        {
+            "name": "每日清体 (采光+领奖)",
+            "label": "每日清体 (采光+领奖)",
+            "description": "自动执行 1 次经验本 + 3 次纽本采光，并领取日常与通行证奖励。",
+            "task": [
+                {
+                    "name": "一键长草",
+                    "enabled": true,
+                    "option": {
+                        "EnableDailyTask": "Yes",
+                        "ExpCount": "1",
+                        "ThreadCount": "3",
+                        "EnableGetReward": "Yes",
+                        "GetPrizeMode": "Both",
+                        "EnableBuyEnkephalin": "No",
+                        "EnableMirrorInFull": "No"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "自动镜牢 (火队·烧伤)",
+            "label": "自动镜牢 (火队·烧伤)",
+            "description": "主体系: 烧伤 | 商店: 四级优先+保护本体系 | 开局: 全选++ | 初始饰品: 123",
+            "task": [
+                {
+                    "name": "自动镜牢",
+                    "enabled": true,
+                    "option": {
+                        "MirrorTeamSystem": "Burn",
+                        "MirrorShopStrategy": "FuseLevelIV",
+                        "ShopAdvancedFusing": "AggressiveWithSave",
+                        "OpeningBonusPreset": "LevelPlusPlus",
+                        "OpeningItemsOrder": "Order123",
+                        "AvoidSkill3": "No",
+                        "PrioritizeSkill3": "No"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "自动镜牢 (流血队·避开白棉花)",
+            "label": "自动镜牢 (流血队·避开白棉花)",
+            "description": "主体系: 流血 | 自动避开白棉花 | 商店: 普通合成 | 开局: 全选++",
+            "task": [
+                {
+                    "name": "自动镜牢",
+                    "enabled": true,
+                    "option": {
+                        "MirrorTeamSystem": "Bleed",
+                        "NotSkipWhiteGossypium": "No",
+                        "MirrorShopStrategy": "FuseNormal",
+                        "ShopAdvancedFusing": "Standard",
+                        "OpeningBonusPreset": "LevelPlusPlus",
+                        "OpeningItemsOrder": "Order123"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "自动镜牢 (沉沦队·四级优先)",
+            "label": "自动镜牢 (沉沦队·四级优先)",
+            "description": "主体系: 沉沦 | 商店: 四级优先 | 开局: 全选++",
+            "task": [
+                {
+                    "name": "自动镜牢",
+                    "enabled": true,
+                    "option": {
+                        "MirrorTeamSystem": "Sinking",
+                        "MirrorShopStrategy": "FuseLevelIV",
+                        "ShopAdvancedFusing": "AggressiveWithSave",
+                        "OpeningBonusPreset": "LevelPlusPlus"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "自动镜牢 (充能队·四级优先)",
+            "label": "自动镜牢 (充能队·四级优先)",
+            "description": "主体系: 充能 | 商店: 四级优先 | 开局: 全选++",
+            "task": [
+                {
+                    "name": "自动镜牢",
+                    "enabled": true,
+                    "option": {
+                        "MirrorTeamSystem": "Charge",
+                        "MirrorShopStrategy": "FuseLevelIV",
+                        "ShopAdvancedFusing": "AggressiveWithSave",
+                        "OpeningBonusPreset": "LevelPlusPlus"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "自动镜牢 (呼吸队·剑契体系)",
+            "label": "自动镜牢 (呼吸队·剑契体系)",
+            "description": "主体系: 呼吸 | 商店: 四级优先 | 开局: 全选++",
+            "task": [
+                {
+                    "name": "自动镜牢",
+                    "enabled": true,
+                    "option": {
+                        "MirrorTeamSystem": "Poise",
+                        "MirrorShopStrategy": "FuseLevelIV",
+                        "ShopAdvancedFusing": "AggressiveWithSave",
+                        "OpeningBonusPreset": "LevelPlusPlus"
+                    }
+                }
+            ]
+        }
+    ]
 }

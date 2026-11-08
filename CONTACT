@@ -1,5 +1,8 @@
-# 联系方式与反馈
+# 帮助与反馈
 
-- **GitHub 仓库**：[DeconstructedCube/AhabAssistantLimbusCompany-Android](https://github.com/DeconstructedCube/AhabAssistantLimbusCompany-Android)
-- **上游项目**：[KIYI671/AhabAssistantLimbusCompany](https://github.com/KIYI671/AhabAssistantLimbusCompany)
-- **问题反馈**：如遇识别卡死或操作异常，请在 GitHub Issues 提交日志（App 侧边栏可直接导出日志）。
+### 源码与问题反馈
+- [GitHub 仓库](https://github.com/DeconstructedCube/AhabAssistantLimbusCompany-Android)
+- [上游项目 (AALC)](https://github.com/KIYI671/AhabAssistantLimbusCompany)
+
+### 故障排查与日志
+若遇页面卡死或异常，可在侧边栏点击「导出日志」，前往 GitHub 提交 Issue。
