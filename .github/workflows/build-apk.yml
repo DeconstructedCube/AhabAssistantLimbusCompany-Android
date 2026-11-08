@@ -40,14 +40,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd maafwapp
-          for attempt in 1 2 3; do
-            echo "Attempt $attempt to setup MaaFramework..."
-            python scripts/setup_maa_framework.py --abi arm64-v8a && break || {
-              if [ $attempt -eq 3 ]; then exit 1; fi
-              echo "Retrying in 5 seconds..."
-              sleep 5
-            }
-          done
+          mkdir -p .maa-cache
+          gh release download --repo MaaXYZ/MaaFramework --pattern "MAA-android-aarch64-*.zip" --dir .maa-cache || true
+          python scripts/setup_maa_framework.py --abi arm64-v8a
       - name: Build Android CPython Agent Runtime
         run: |
           cd maafwapp
