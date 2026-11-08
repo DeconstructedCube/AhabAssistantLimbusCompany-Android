@@ -1,0 +1,93 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# ==============================================================================
+# Android Termux ADB Shim via Shizuku
+# 作用：将标准 ADB CLI 命令无缝桥接至本机 Shizuku (`~/rish`)，使无需无线调试与电脑
+# 也能伪装成标准的已连接 ADB 设备。
+# ==============================================================================
+
+RISH_BIN="${HOME}/rish"
+if [ ! -f "$RISH_BIN" ]; then
+    RISH_BIN="/data/data/com.termux/files/home/rish"
+fi
+
+if [ ! -f "$RISH_BIN" ]; then
+    echo "Error: Shizuku rish not found at $RISH_BIN" >&2
+    exit 1
+fi
+
+SHARED_BRIDGE="/sdcard/Download"
+
+# 处理参数
+CMD="$1"
+
+case "$CMD" in
+    devices)
+        echo "List of devices attached"
+        echo "local-shizuku	device"
+        exit 0
+        ;;
+    version)
+        echo "Android Debug Bridge version 1.0.41 (Shizuku-Native-Shim)"
+        echo "Version 34.0.5-Termux"
+        exit 0
+        ;;
+    start-server|kill-server)
+        exit 0
+        ;;
+    connect)
+        echo "connected to local-shizuku:5555"
+        exit 0
+        ;;
+    disconnect)
+        echo "disconnected local-shizuku"
+        exit 0
+        ;;
+    shell)
+        shift
+        if [ $# -eq 0 ]; then
+            exec bash "$RISH_BIN"
+        else
+            exec bash "$RISH_BIN" -c "$*"
+        fi
+        ;;
+    exec-out)
+        shift
+        exec bash "$RISH_BIN" -c "$*"
+        ;;
+    push)
+        SRC="$2"
+        DST="$3"
+        if [ -z "$SRC" ] || [ -z "$DST" ]; then
+            echo "adb push: missing arguments" >&2
+            exit 1
+        fi
+        TMP_NAME=".adb_bridge_$(date +%s%N)_$(basename "$SRC")"
+        cp "$SRC" "$SHARED_BRIDGE/$TMP_NAME"
+        bash "$RISH_BIN" -c "cp '$SHARED_BRIDGE/$TMP_NAME' '$DST' && rm -f '$SHARED_BRIDGE/$TMP_NAME'"
+        exit 0
+        ;;
+    pull)
+        SRC="$2"
+        DST="$3"
+        if [ -z "$SRC" ] || [ -z "$DST" ]; then
+            echo "adb pull: missing arguments" >&2
+            exit 1
+        fi
+        TMP_NAME=".adb_bridge_$(date +%s%N)_$(basename "$SRC")"
+        bash "$RISH_BIN" -c "cp '$SRC' '$SHARED_BRIDGE/$TMP_NAME' && chmod 666 '$SHARED_BRIDGE/$TMP_NAME'"
+        cp "$SHARED_BRIDGE/$TMP_NAME" "$DST"
+        rm -f "$SHARED_BRIDGE/$TMP_NAME"
+        exit 0
+        ;;
+    forward|reverse)
+        exit 0
+        ;;
+    -s)
+        # 兼容 adb -s <serial> shell ... 语法
+        shift 2
+        exec "$0" "$@"
+        ;;
+    *)
+        exec bash "$RISH_BIN" -c "$*"
+        ;;
+esac

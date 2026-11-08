@@ -8,6 +8,7 @@ import cv2
 import numpy as np
 from adbutils import adb
 from adbutils.errors import AdbError
+import os
 
 from module.config import cfg
 from module.logger import log
@@ -72,6 +73,7 @@ key_list = {
     "esc": 111,
     "up": 19,
     "down": 20,
+
     "left": 21,
     "right": 22,
     "space": 62,
@@ -80,6 +82,39 @@ key_list = {
     "ctrl": 113,
     "alt": 57,
 }
+class ShizukuDeviceProxy:
+    """在 Android/Termux 环境下模拟 adbutils.AdbDevice 的代理类，走本机 Shizuku 与 VirtualDisplay"""
+
+    def __init__(self, maa_control):
+        self.maa = maa_control
+        self.serial = "local-shizuku"
+
+    def shell(self, cmd, timeout=None):
+        if isinstance(cmd, list):
+            cmd_str = " ".join(cmd)
+        else:
+            cmd_str = str(cmd)
+        return self.maa._run_rish(cmd_str)
+
+    def screenshot(self):
+        from PIL import Image
+        return Image.fromarray(self.maa.screenshot())
+
+    def list_packages(self):
+        out = self.shell("pm list packages")
+        return [line.replace("package:", "").strip() for line in out.splitlines()]
+
+    def check_game_alive(self):
+        return self.maa.check_game_alive()
+
+    def is_screen_on(self):
+        return True
+
+    def start_game(self):
+        self.maa.start_game()
+
+    def close_current_app(self):
+        self.maa.close_current_app()
 
 
 def _adb_connect_succeeded(message: str) -> bool:
@@ -397,10 +432,19 @@ class SimulatorControl(AbstractInput):
         launcher.close(instance)
         self.simulator_device = None
         self.simulator_control = None
-        self.simulator_port = None
-        SimulatorControl.connection_device = None
-
     def get_simulator(self):
+        if os.path.exists("/data/data/com.termux") or os.environ.get("TERMUX_VERSION") or cfg.simulator_type == 2:
+            from module.automation.input_handlers.maa_control import MaaControl
+            if MaaControl.connection_device is None:
+                MaaControl()
+            maa = MaaControl.connection_device
+            self.simulator_device = ShizukuDeviceProxy(maa)
+            self.simulator_max_x = 1920
+            self.simulator_max_y = 1080
+            SimulatorControl.connection_device = maa
+            log.info("检测到 Android/Termux 本地环境，自动桥接至 Shizuku/MaaControl 原生驱动")
+            return self.simulator_device
+
         if self.simulator_device is not None:
             return self.simulator_device
 
