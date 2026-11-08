@@ -36,10 +36,18 @@ jobs:
           git clone --depth 1 https://github.com/Aliothmoon/MaaFwApp.git maafwapp
 
       - name: Set up MaaFramework Native Binaries (arm64-v8a)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd maafwapp
-          python scripts/setup_maa_framework.py --abi arm64-v8a
-
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt to setup MaaFramework..."
+            python scripts/setup_maa_framework.py --abi arm64-v8a && break || {
+              if [ $attempt -eq 3 ]; then exit 1; fi
+              echo "Retrying in 5 seconds..."
+              sleep 5
+            }
+          done
       - name: Build Android CPython Agent Runtime
         run: |
           cd maafwapp
