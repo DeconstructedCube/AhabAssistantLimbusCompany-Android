@@ -35,21 +35,26 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/Aliothmoon/MaaFwApp.git maafwapp
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          build-root-directory: maafwapp
-
       - name: Set up MaaFramework Native Binaries (arm64-v8a)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd maafwapp
+          mkdir -p .maa-cache
+          gh release download --repo MaaXYZ/MaaFramework --pattern "MAA-android-aarch64-*.zip" --dir .maa-cache || true
           python scripts/setup_maa_framework.py --abi arm64-v8a
+
       - name: Build Android CPython Agent Runtime
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd maafwapp
           pip install packaging
+          mkdir -p .maafw/download/3.13.15-maafw5.13.0
+          gh release download 3.13.15-maafw5.13.0 \
+            --repo Aliothmoon/MaaAgentCoreAndroid \
+            --pattern "agent-core-*-arm64-v8a.tar.gz" \
+            --dir .maafw/download/3.13.15-maafw5.13.0 || true
           python scripts/build_agent_bundle.py \
             --out ../agent-dist \
             --requirements ../requirements-android.txt \
@@ -68,11 +73,16 @@ jobs:
           cat local.properties
 
       - name: Build Android Release APK with Gradle
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd maafwapp
+          gh release download v9.4.1 --repo gradle/gradle-distributions --pattern "gradle-9.4.1-bin.zip" --dir /tmp || true
+          if [ -f /tmp/gradle-9.4.1-bin.zip ]; then
+            sed -i 's|distributionUrl=.*|distributionUrl=file\\:///tmp/gradle-9.4.1-bin.zip|' gradle/wrapper/gradle-wrapper.properties
+          fi
           chmod +x gradlew
           ./gradlew :app:assembleRelease --stacktrace --no-daemon
-
       - name: Sign Android Release APK with apksigner
         run: |
           KEYSTORE="release.keystore"
