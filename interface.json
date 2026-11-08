@@ -59,6 +59,7 @@
                 "ExpCount",
                 "ThreadCount",
                 "DailyTeamNumber",
+                "UseContinuousCombat",
                 "EnableGetReward",
                 "GetPrizeMode",
                 "EnableBuyEnkephalin",
@@ -66,7 +67,7 @@
                 "DrGrandetMode",
                 "SkipEnkephalin",
                 "EnableMirrorInFull",
-                "MirrorTeamSystem",
+                "MirrorTeamMode",
                 "HardMirror"
             ],
             "group": [
@@ -152,18 +153,14 @@
             "description": "全流程自动运行镜牢。",
             "option": [
                 "MirrorCount",
-                "MirrorTeamSystem",
-                "MirrorTeamNumber",
+                "MirrorTeamMode",
                 "HardMirror",
-                "AutoHardMirror",
                 "MirrorShopStrategy",
                 "AfterFuseLevelIV",
                 "NotSkipWhiteGossypium",
-                "SaveHardRewards",
                 "Floor3Exit",
-                "AvoidSkill3",
-                "PrioritizeSkill3",
-                "DefenseFirstRound"
+                "AdvancedBattleGroup",
+                "AdvancedShopGroup"
             ],
             "group": [
                 "mirror"
@@ -557,28 +554,34 @@
             }
         },
         "HardMirror": {
-            "type": "switch",
-            "label": "困难模式",
-            "default_case": "No",
+            "type": "select",
+            "label": "镜牢难度模式",
+            "default_case": "Normal",
             "cases": [
                 {
-                    "name": "Yes",
-                    "label": "困难镜牢",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "hard_mirror": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
+                    "name": "Normal",
                     "label": "普通镜牢",
                     "pipeline_override": {
                         "AALC_ConfigHolder": {
                             "attach": {
                                 "hard_mirror": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Hard",
+                    "label": "困难镜牢",
+                    "option": [
+                        "AutoHardMirror",
+                        "SaveHardRewards",
+                        "HardMirrorSingleBonuses",
+                        "NormalToHardFloor"
+                    ],
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "hard_mirror": true
                             }
                         }
                     }
@@ -1457,6 +1460,361 @@
                             }
                         }
                     }
+                }
+            ]
+        },
+        "TeamCodeInput": {
+            "type": "input",
+            "label": "编队码内容",
+            "description": "粘贴游戏内分享的队伍编队码字符串",
+            "inputs": [
+                {
+                    "name": "tcode",
+                    "label": "编队码",
+                    "default": "",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "use_team_code": true,
+                        "team_code": "{tcode}"
+                    }
+                }
+            }
+        },
+        "MirrorTeamMode": {
+            "type": "select",
+            "label": "编队指定方式",
+            "default_case": "Manual",
+            "cases": [
+                {
+                    "name": "Manual",
+                    "label": "按队伍序号与体系 (默认)",
+                    "option": [
+                        "MirrorTeamSystem",
+                        "MirrorTeamNumber",
+                        "SinnerOrderInput"
+                    ],
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_team_code": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "TeamCode",
+                    "label": "使用游戏内编队码",
+                    "option": [
+                        "TeamCodeInput"
+                    ],
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_team_code": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "NormalToHardFloor": {
+            "type": "select",
+            "label": "中途切入困难模式的楼层",
+            "default_case": "Never",
+            "cases": [
+                {
+                    "name": "Never",
+                    "label": "开局即困难 (0)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "normal_to_hard_floor": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Floor3",
+                    "label": "第 3 层切困难",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "normal_to_hard_floor": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Floor4",
+                    "label": "第 4 层切困难",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "normal_to_hard_floor": 4
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "DefenseForSolo": {
+            "type": "switch",
+            "label": "小指良单通 (前几回合连续守备献祭队友)",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启单通献祭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "defense_for_solo": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "defense_for_solo": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "FightToLastMan": {
+            "type": "switch",
+            "label": "战斗直到全灭 (存活不足5人也不提前重开)",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "战至全灭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "fight_to_last_man": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "人员不足自动重开 (推荐)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "fight_to_last_man": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ReFormationEachFloor": {
+            "type": "switch",
+            "label": "每个楼层首战重新编队",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "re_formation_each_floor": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "re_formation_each_floor": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "MirrorMapNavMode": {
+            "type": "select",
+            "label": "地图寻路模式",
+            "default_case": "TouchYOLO",
+            "cases": [
+                {
+                    "name": "TouchYOLO",
+                    "label": "智能触控拖拽 (默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "mirror_keyboard_navigation": false,
+                                "mirror_keyboard_simple_pathfinding": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "VirtualKey",
+                    "label": "按键寻路 (防触控滑动失效/镜头漂移)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "mirror_keyboard_navigation": true,
+                                "mirror_keyboard_simple_pathfinding": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "SimpleUp",
+                    "label": "盲按模式 (极简按↑，不滑动镜头)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "mirror_keyboard_navigation": true,
+                                "mirror_keyboard_simple_pathfinding": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SkillReplacementOption": {
+            "type": "select",
+            "label": "商店技能替换",
+            "default_case": "NoReplace",
+            "cases": [
+                {
+                    "name": "NoReplace",
+                    "label": "不替换技能",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skill_replacement": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "FirstSinner1To3",
+                    "label": "队长首位: 1技能 → 3技能",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skill_replacement": true,
+                                "skill_replacement_select": 0,
+                                "skill_replacement_mode": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "AllSelected1To3",
+                    "label": "全员首发: 1技能 → 3技能",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skill_replacement": true,
+                                "skill_replacement_select": 3,
+                                "skill_replacement_mode": 0
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "MaxKeywordRefresh": {
+            "type": "input",
+            "label": "商店定向刷新次数上限 (0~5)",
+            "inputs": [
+                {
+                    "name": "kr",
+                    "label": "定向刷新次数",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "max_keyword_refresh": "{kr}"
+                    }
+                }
+            }
+        },
+        "MaxNormalRefresh": {
+            "type": "input",
+            "label": "商店普通刷新次数上限 (0~5)",
+            "inputs": [
+                {
+                    "name": "nr",
+                    "label": "普通刷新次数",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "max_normal_refresh": "{nr}"
+                    }
+                }
+            }
+        },
+        "AdvancedBattleGroup": {
+            "type": "switch",
+            "label": "战斗高阶策略设置",
+            "default_case": "Default",
+            "cases": [
+                {
+                    "name": "Custom",
+                    "label": "展开设置",
+                    "option": [
+                        "DefenseFirstRound",
+                        "DefenseForSolo",
+                        "AvoidSkill3",
+                        "PrioritizeSkill3",
+                        "FightToLastMan",
+                        "ReFormationEachFloor",
+                        "MirrorMapNavMode"
+                    ]
+                },
+                {
+                    "name": "Default",
+                    "label": "默认策略 (收起)"
+                }
+            ]
+        },
+        "AdvancedShopGroup": {
+            "type": "switch",
+            "label": "商店进阶策略与技能替换",
+            "default_case": "Default",
+            "cases": [
+                {
+                    "name": "Custom",
+                    "label": "展开设置",
+                    "option": [
+                        "ShopAdvancedFusing",
+                        "SkillReplacementOption",
+                        "MaxKeywordRefresh",
+                        "MaxNormalRefresh"
+                    ]
+                },
+                {
+                    "name": "Default",
+                    "label": "默认策略 (收起)"
                 }
             ]
         }
