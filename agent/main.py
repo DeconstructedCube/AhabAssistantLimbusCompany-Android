@@ -217,10 +217,10 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
 
         mode = overrides.get("sinner_order_mode")
         if mode == "pick":
-            # 逐席位指定 1~7 号主力人选
+            # 逐席位指定 1~12 号首发与全部后备替补人选
             ranks = [
                 int(overrides.get(f"sinner_rank_{r}", 0))
-                for r in range(1, 8)
+                for r in range(1, 13)
                 if int(overrides.get(f"sinner_rank_{r}", 0)) > 0
             ]
             if ranks:

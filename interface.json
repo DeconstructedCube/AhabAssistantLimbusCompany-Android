@@ -3140,7 +3140,7 @@
         },
         "SinnerRank1": {
             "type": "select",
-            "label": "第 1 顺位 (首发队长·每回合多1技能槽)",
+            "label": "第 1 顺位 (首发队长·首个技能槽)",
             "default_case": "Sinner_0",
             "cases": [
                 {
@@ -3290,7 +3290,7 @@
         },
         "SinnerRank2": {
             "type": "select",
-            "label": "第 2 顺位 (次发·少人战优先得槽)",
+            "label": "第 2 顺位 (次席·次发技能槽)",
             "default_case": "Sinner_0",
             "cases": [
                 {
@@ -3890,7 +3890,7 @@
         },
         "SinnerRank6": {
             "type": "select",
-            "label": "第 6 顺位 (常规参战主力末位)",
+            "label": "第 6 顺位 (首发主力末位)",
             "default_case": "Sinner_0",
             "cases": [
                 {
@@ -4040,7 +4040,7 @@
         },
         "SinnerRank7": {
             "type": "select",
-            "label": "第 7 顺位 (7人战参战主力)",
+            "label": "第 7 顺位 (7人战首发 / 首个阵亡替补)",
             "default_case": "Sinner_0",
             "cases": [
                 {
@@ -4207,7 +4207,7 @@
                 },
                 {
                     "name": "PickRanks",
-                    "label": "逐席位点选主力顺位 (1~7号主力人选)",
+                    "label": "逐席位点选出战与后备顺序 (1~12全席位直选)",
                     "option": [
                         "SinnerRank1",
                         "SinnerRank2",
@@ -4215,7 +4215,12 @@
                         "SinnerRank4",
                         "SinnerRank5",
                         "SinnerRank6",
-                        "SinnerRank7"
+                        "SinnerRank7",
+                        "SinnerRank8",
+                        "SinnerRank9",
+                        "SinnerRank10",
+                        "SinnerRank11",
+                        "SinnerRank12"
                     ],
                     "pipeline_override": {
                         "AALC_ConfigHolder": {
@@ -4235,6 +4240,756 @@
                         "AALC_ConfigHolder": {
                             "attach": {
                                 "sinner_order_mode": "text"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SinnerRank8": {
+            "type": "select",
+            "label": "第 8 顺位 (第 2 顺位阵亡替补)",
+            "default_case": "Sinner_0",
+            "cases": [
+                {
+                    "name": "Sinner_0",
+                    "label": "未指定 (按默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_1",
+                    "label": "1号: 李箱 (Yi Sang)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_2",
+                    "label": "2号: 浮士德 (Faust)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_3",
+                    "label": "3号: 堂吉诃德 (Don Quixote)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_4",
+                    "label": "4号: 良秀 (Ryoshu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_5",
+                    "label": "5号: 默尔索 (Meursault)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_6",
+                    "label": "6号: 鸿璐 (Hong Lu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_7",
+                    "label": "7号: 希斯克利夫 (Heathcliff)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_8",
+                    "label": "8号: 以实玛利 (Ishmael)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_9",
+                    "label": "9号: 罗佳 (Rodion)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 9
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_10",
+                    "label": "10号: 辛克莱 (Sinclair)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 10
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_11",
+                    "label": "11号: 奥提斯 (Outis)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 11
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_12",
+                    "label": "12号: 格里高尔 (Gregor)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_8": 12
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SinnerRank9": {
+            "type": "select",
+            "label": "第 9 顺位 (第 3 顺位阵亡替补)",
+            "default_case": "Sinner_0",
+            "cases": [
+                {
+                    "name": "Sinner_0",
+                    "label": "未指定 (按默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_1",
+                    "label": "1号: 李箱 (Yi Sang)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_2",
+                    "label": "2号: 浮士德 (Faust)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_3",
+                    "label": "3号: 堂吉诃德 (Don Quixote)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_4",
+                    "label": "4号: 良秀 (Ryoshu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_5",
+                    "label": "5号: 默尔索 (Meursault)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_6",
+                    "label": "6号: 鸿璐 (Hong Lu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_7",
+                    "label": "7号: 希斯克利夫 (Heathcliff)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_8",
+                    "label": "8号: 以实玛利 (Ishmael)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_9",
+                    "label": "9号: 罗佳 (Rodion)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 9
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_10",
+                    "label": "10号: 辛克莱 (Sinclair)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 10
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_11",
+                    "label": "11号: 奥提斯 (Outis)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 11
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_12",
+                    "label": "12号: 格里高尔 (Gregor)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_9": 12
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SinnerRank10": {
+            "type": "select",
+            "label": "第 10 顺位 (第 4 顺位阵亡替补)",
+            "default_case": "Sinner_0",
+            "cases": [
+                {
+                    "name": "Sinner_0",
+                    "label": "未指定 (按默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_1",
+                    "label": "1号: 李箱 (Yi Sang)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_2",
+                    "label": "2号: 浮士德 (Faust)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_3",
+                    "label": "3号: 堂吉诃德 (Don Quixote)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_4",
+                    "label": "4号: 良秀 (Ryoshu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_5",
+                    "label": "5号: 默尔索 (Meursault)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_6",
+                    "label": "6号: 鸿璐 (Hong Lu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_7",
+                    "label": "7号: 希斯克利夫 (Heathcliff)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_8",
+                    "label": "8号: 以实玛利 (Ishmael)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_9",
+                    "label": "9号: 罗佳 (Rodion)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 9
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_10",
+                    "label": "10号: 辛克莱 (Sinclair)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 10
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_11",
+                    "label": "11号: 奥提斯 (Outis)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 11
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_12",
+                    "label": "12号: 格里高尔 (Gregor)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_10": 12
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SinnerRank11": {
+            "type": "select",
+            "label": "第 11 顺位 (第 5 顺位阵亡替补)",
+            "default_case": "Sinner_0",
+            "cases": [
+                {
+                    "name": "Sinner_0",
+                    "label": "未指定 (按默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_1",
+                    "label": "1号: 李箱 (Yi Sang)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_2",
+                    "label": "2号: 浮士德 (Faust)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_3",
+                    "label": "3号: 堂吉诃德 (Don Quixote)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_4",
+                    "label": "4号: 良秀 (Ryoshu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_5",
+                    "label": "5号: 默尔索 (Meursault)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_6",
+                    "label": "6号: 鸿璐 (Hong Lu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_7",
+                    "label": "7号: 希斯克利夫 (Heathcliff)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_8",
+                    "label": "8号: 以实玛利 (Ishmael)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_9",
+                    "label": "9号: 罗佳 (Rodion)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 9
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_10",
+                    "label": "10号: 辛克莱 (Sinclair)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 10
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_11",
+                    "label": "11号: 奥提斯 (Outis)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 11
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_12",
+                    "label": "12号: 格里高尔 (Gregor)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_11": 12
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SinnerRank12": {
+            "type": "select",
+            "label": "第 12 顺位 (末席后备)",
+            "default_case": "Sinner_0",
+            "cases": [
+                {
+                    "name": "Sinner_0",
+                    "label": "未指定 (按默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_1",
+                    "label": "1号: 李箱 (Yi Sang)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_2",
+                    "label": "2号: 浮士德 (Faust)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_3",
+                    "label": "3号: 堂吉诃德 (Don Quixote)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_4",
+                    "label": "4号: 良秀 (Ryoshu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_5",
+                    "label": "5号: 默尔索 (Meursault)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_6",
+                    "label": "6号: 鸿璐 (Hong Lu)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_7",
+                    "label": "7号: 希斯克利夫 (Heathcliff)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_8",
+                    "label": "8号: 以实玛利 (Ishmael)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_9",
+                    "label": "9号: 罗佳 (Rodion)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 9
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_10",
+                    "label": "10号: 辛克莱 (Sinclair)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 10
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_11",
+                    "label": "11号: 奥提斯 (Outis)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 11
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinner_12",
+                    "label": "12号: 格里高尔 (Gregor)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "sinner_rank_12": 12
                             }
                         }
                     }
