@@ -81,6 +81,7 @@ jobs:
           if [ -f /tmp/gradle-9.4.1-bin.zip ]; then
             sed -i 's|distributionUrl=.*|distributionUrl=file\\:///tmp/gradle-9.4.1-bin.zip|' gradle/wrapper/gradle-wrapper.properties
           fi
+          sed -i 's|mavenCentral()|maven { url = uri("https://repo1.maven.org/maven2") }\n        mavenCentral()|g' settings.gradle.kts build-logic/settings.gradle.kts
           chmod +x gradlew
           ./gradlew :app:assembleRelease --stacktrace --no-daemon
       - name: Sign Android Release APK with apksigner
