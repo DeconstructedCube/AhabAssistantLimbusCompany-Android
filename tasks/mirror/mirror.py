@@ -369,13 +369,18 @@ class Mirror:
 
             # 战斗配队的情况
             if auto.find_element("teams/identify_assets.png"):
-                # 如果第一次启动脚本，还没进行编队，就先编队
+                # 如果第一次启动脚本，还没进行编队，就先编队（若设置保持游戏内原有顺序且非全0，才执行重排）
                 if self.first_battle:
-                    team_formation(self.sinner_team)
+                    if any(x > 0 for x in self.sinner_team):
+                        team_formation(self.sinner_team)
+                    else:
+                        log.info("保持游戏内原有罪人出战顺序，跳过清空重选")
                     self.first_battle = False
                     continue
-                # 战斗配队失败的情况
+                # 战斗配队失败的情况（游戏内编队槽位为空时自动兜底全选 1~12）
                 if auto.click_element("teams/none_sinner_assets.png", model="clam"):
+                    if not any(x > 0 for x in self.sinner_team):
+                        self.sinner_team = list(range(1, 13))
                     self.first_battle = True
                     continue
                 # 如果未开启战斗直至全灭，则检测罪人幸存人数是否少于10人
@@ -402,6 +407,8 @@ class Mirror:
             # 没有配队的情况
             if auto.find_element("battle/select_none_assets.png"):
                 auto.mouse_click_blank()
+                if not any(x > 0 for x in self.sinner_team):
+                    self.sinner_team = list(range(1, 13))
                 self.first_battle = True
                 continue
 
@@ -1013,7 +1020,7 @@ class Mirror:
 
         # 体系之间的间距
         system_distance = second_point[0] - first_point[0]
-        print(system_distance)
+        log.debug(f"观测饰品体系间距: {system_distance}")
 
         gift_box = ImageUtils.get_bbox(ImageUtils.load_image("mirror/road_to_mir/observe_ego_gift/gift_box_bbox.png"))
 
@@ -1036,7 +1043,7 @@ class Mirror:
             else:
                 system_index = [k for k, v in observe_system.items() if v == file_system][0]
 
-            print(system_index)
+            log.debug(f"观测饰品目标体系索引: {system_index}")
             # 选择体系，先点一下其他体系，再点回来，重置页面
             auto.mouse_click(first_point[0], first_point[1])
             sleep(0.5)

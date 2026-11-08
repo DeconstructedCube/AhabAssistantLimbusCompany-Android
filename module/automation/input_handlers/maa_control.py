@@ -3,6 +3,7 @@ import os
 import random
 import struct
 import subprocess
+import threading
 from time import sleep
 from typing import Any
 
@@ -93,6 +94,9 @@ class MaaControl(AbstractInput):
         self.raw_width: int = 1920
         self.raw_height: int = 1080
         self._daemon_proc: subprocess.Popen | None = None
+        self._rish_proc: subprocess.Popen | None = None
+        self._rish_lock = threading.Lock()
+        self._vd_initialized: bool = False
 
         # 强制 AALC 内部使用 1080P 模拟器模式基准
         cfg.unsaved_set_value("simulator", True)
@@ -101,9 +105,6 @@ class MaaControl(AbstractInput):
 
         if self.maa_context is not None:
             self._configure_maa_controller()
-        elif os.path.exists(self.rish_path) and self.use_virtual_display:
-            self._ensure_shizuku_virtual_display()
-
         MaaControl.connection_device = self
 
     @classmethod
@@ -134,9 +135,69 @@ class MaaControl(AbstractInput):
         except Exception as e:
             log.debug(f"配置 MaaFramework 控制器参数时提示: {e}")
 
+    def _close_rish_shell(self) -> None:
+        with self._rish_lock:
+            if self._rish_proc is not None:
+                try:
+                    if self._rish_proc.stdin:
+                        self._rish_proc.stdin.close()
+                    self._rish_proc.terminate()
+                except Exception:
+                    pass
+                self._rish_proc = None
+
     def _run_rish(self, cmd: str) -> str:
-        res = subprocess.run(["bash", self.rish_path, "-c", cmd], capture_output=True, text=True, check=False)
+        if not os.path.exists(self.rish_path):
+            return ""
+        marker = "__AALC_RISH_DONE__"
+        with self._rish_lock:
+            try:
+                if self._rish_proc is None or self._rish_proc.poll() is not None:
+                    self._rish_proc = subprocess.Popen(
+                        ["bash", self.rish_path, "-c", "sh"],
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL,
+                        text=True,
+                        bufsize=1,
+                    )
+                assert self._rish_proc.stdin is not None and self._rish_proc.stdout is not None
+                self._rish_proc.stdin.write(f"{cmd}\necho {marker}\n")
+                self._rish_proc.stdin.flush()
+                out_lines: list[str] = []
+                while True:
+                    line = self._rish_proc.stdout.readline()
+                    if not line:
+                        raise RuntimeError("rish pipe EOF")
+                    stripped = line.rstrip("\r\n")
+                    if stripped == marker or stripped.endswith(marker):
+                        prefix = stripped[: -len(marker)].strip()
+                        if prefix:
+                            out_lines.append(prefix)
+                        break
+                    out_lines.append(stripped)
+                return "\n".join(out_lines).strip()
+            except Exception:
+                if self._rish_proc is not None:
+                    try:
+                        self._rish_proc.kill()
+                    except Exception:
+                        pass
+                    self._rish_proc = None
+        res = subprocess.run(
+            ["bash", self.rish_path, "-c", cmd],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
         return res.stdout.strip()
+
+    def _ensure_ready(self) -> None:
+        if self.maa_context is None and not self._vd_initialized:
+            self._vd_initialized = True
+            if os.path.exists(self.rish_path) and self.use_virtual_display:
+                self._ensure_shizuku_virtual_display()
 
     def _ensure_shizuku_virtual_display(self) -> None:
         vd_info = "/sdcard/Download/.vd_info"
@@ -168,10 +229,17 @@ class MaaControl(AbstractInput):
             self.display_id = 0
             return
 
-        self._run_rish(
-            "rm -f /sdcard/Download/.vd_info /sdcard/Download/.vd_cmd_capture "
-            "/sdcard/Download/.vd_cmd_stop /sdcard/Download/.vd_captured_done"
-        )
+        for stale_file in (
+            "/sdcard/Download/.vd_info",
+            "/sdcard/Download/.vd_cmd_capture",
+            "/sdcard/Download/.vd_cmd_stop",
+            "/sdcard/Download/.vd_captured_done",
+        ):
+            try:
+                if os.path.exists(stale_file):
+                    os.remove(stale_file)
+            except OSError:
+                pass
         self._daemon_proc = subprocess.Popen(
             ["bash", self.rish_path, "-c", f"CLASSPATH={jar_dest} exec /system/bin/app_process /system/bin VdDaemon"],
             stdout=subprocess.PIPE,
@@ -191,11 +259,27 @@ class MaaControl(AbstractInput):
         self.display_id = 0
 
     def stop_virtual_display(self) -> None:
-        if self.display_id > 0 and os.path.exists(self.rish_path):
-            self._run_rish("touch /sdcard/Download/.vd_cmd_stop")
-            sleep(0.5)
+        if self.display_id > 0:
+            try:
+                with open("/sdcard/Download/.vd_cmd_stop", "wb"):
+                    pass
+            except OSError:
+                if os.path.exists(self.rish_path):
+                    self._run_rish("touch /sdcard/Download/.vd_cmd_stop")
+            sleep(0.3)
+            for tmp_file in (
+                "/sdcard/Download/.vd_info",
+                "/sdcard/Download/limbus_vd_frame.raw",
+                "/sdcard/Download/.aalc_main_screen.raw",
+            ):
+                try:
+                    if os.path.exists(tmp_file):
+                        os.remove(tmp_file)
+                except OSError:
+                    pass
             self.display_id = 0
-
+        self._vd_initialized = False
+        self._close_rish_shell()
     def _map_xy(self, x: float, y: float) -> tuple[int, int]:
         if self.maa_context is not None:
             try:
@@ -217,6 +301,7 @@ class MaaControl(AbstractInput):
             except Exception:
                 return False
         if os.path.exists(self.rish_path):
+            self._ensure_ready()
             out = self._run_rish(f"pidof {LIMBUS_PACKAGE}")
             return bool(out.strip())
         return True
@@ -231,6 +316,7 @@ class MaaControl(AbstractInput):
             except Exception as e:
                 log.warning(f"MaaController post_start_app 异常: {e}")
         if os.path.exists(self.rish_path):
+            self._ensure_ready()
             if self.display_id > 0:
                 self._run_rish(f"am start --display {self.display_id} -n {LIMBUS_ACTIVITY}")
             else:
@@ -265,14 +351,22 @@ class MaaControl(AbstractInput):
                 bgr = cv2.resize(bgr, (1920, 1080), interpolation=cv2.INTER_LINEAR)
             return cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
 
+        self._ensure_ready()
         if self.display_id > 0 and os.path.exists(self.rish_path):
             done_file = "/sdcard/Download/.vd_captured_done"
             raw_file = "/sdcard/Download/limbus_vd_frame.raw"
-            self._run_rish(f"rm -f {done_file} && touch /sdcard/Download/.vd_cmd_capture")
-            for _ in range(30):
-                sleep(0.1)
+            cmd_file = "/sdcard/Download/.vd_cmd_capture"
+            try:
+                if os.path.exists(done_file):
+                    os.remove(done_file)
+                with open(cmd_file, "wb"):
+                    pass
+            except OSError:
+                self._run_rish(f"rm -f {done_file} && touch {cmd_file}")
+            for _ in range(200):
                 if os.path.exists(done_file):
                     break
+                sleep(0.015)
             if os.path.exists(raw_file):
                 with open(raw_file, "rb") as f:
                     hdr = f.read(12)
@@ -298,6 +392,7 @@ class MaaControl(AbstractInput):
         return rgb
 
     def mouse_click(self, x, y, times=1, move_back=False) -> bool:
+        self._ensure_ready()
         rx, ry = self._map_xy(x, y)
         log.debug(f"点击位置:({rx},{ry})", stacklevel=2)
         for _ in range(times):
@@ -325,6 +420,7 @@ class MaaControl(AbstractInput):
         return False
 
     def mouse_drag(self, x, y, drag_time=0.1, dx=0, dy=0, move_back=True) -> None:
+        self._ensure_ready()
         rx1, ry1 = self._map_xy(x, y)
         rx2, ry2 = self._map_xy(x + dx, y + dy)
         dur_ms = max(100, int(float(drag_time or 0.3) * 1000))
@@ -373,6 +469,7 @@ class MaaControl(AbstractInput):
         *,
         start_settle_seconds: float = 0.0,
     ) -> None:
+        self._ensure_ready()
         plan = build_scroll_swipe_plan(x, y, dx=dx, dy=dy, duration=duration)
         if len(plan) <= 1:
             self.wait_pause()
@@ -411,7 +508,7 @@ class MaaControl(AbstractInput):
         if len(position) == 1:
             self.mouse_click(position[0][0], position[0][1])
             return
-
+        self._ensure_ready()
         interpolated: list[tuple[int, int]] = []
         for idx in range(len(position) - 1):
             p0 = self._map_xy(position[idx][0], position[idx][1])
@@ -448,6 +545,7 @@ class MaaControl(AbstractInput):
         self.wait_pause()
 
     def key_press(self, key: str) -> None:
+        self._ensure_ready()
         keycode = ANDROID_KEY_MAP.get(key.lower())
         if keycode is None:
             log.warning(f"未知的 Android 按键映射: {key}")
@@ -463,6 +561,7 @@ class MaaControl(AbstractInput):
     def input_text(self, text: str) -> None:
         if not text:
             return
+        self._ensure_ready()
         log.debug(f"输入文本: {text}", stacklevel=2)
         if self.maa_context is not None:
             self.maa_context.tasker.controller.post_input_text(text).wait()

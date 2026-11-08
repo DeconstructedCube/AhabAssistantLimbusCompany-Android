@@ -225,6 +225,12 @@ class OCR(metaclass=SingletonMeta):
         self.logger = logger
         self.engine = None
         self._pure_onnx_engine = None
+        self._local_engine_initialized = False
+
+    def _ensure_local_engine(self) -> None:
+        if self._local_engine_initialized:
+            return
+        self._local_engine_initialized = True
         self._init_local_engine()
 
     def _init_local_engine(self) -> None:
@@ -340,24 +346,24 @@ class OCR(metaclass=SingletonMeta):
             clahe = createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
             processed_image = clahe.apply(img_cv_gray)
 
-            # 1. 若有原生 ONNX 引擎，优先使用（支持单行数字直识兜底与完整 DBNet 裁剪）
+            # 1. 若绑定了 MaaFramework Context，优先调用 C++ 原生 OCR 算子（零重复模型内存占用）
+            maa_res = self._run_via_maa_context(processed_image)
+            if maa_res is not None and maa_res.txts:
+                self.log_results(maa_res)
+                return maa_res
+
+            # 2. 按需懒加载本地原生 ONNX 引擎（支持单行数字直识兜底与完整 DBNet 裁剪）
+            self._ensure_local_engine()
             if self._pure_onnx_engine is not None:
                 results = self._pure_onnx_engine(processed_image)
                 self.log_results(results)
                 return results
-
-            # 2. 尝试通过 MaaFramework Context 执行 C++ OCR
-            maa_res = self._run_via_maa_context(processed_image)
-            if maa_res is not None:
-                self.log_results(maa_res)
-                return maa_res
 
             # 3. 回退 RapidOCR
             if self.engine is not None:
                 results = self.engine(processed_image)
                 self.log_results(results)
                 return results
-
             return RapidOCROutput()
         except Exception as e:
             self.logger.error(e)

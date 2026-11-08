@@ -27,16 +27,18 @@ from module.logger.my_log import Logger
 Logger()
 
 from module.automation import auto
-from module.config import cfg, TeamSetting
+from module.automation.input_handlers.maa_control import MaaControl
+from module.config import TeamSetting, cfg
 from module.logger import log
+from tasks import all_systems
 from tasks.base.back_init_menu import back_init_menu
 from tasks.base.make_enkephalin_module import lunacy_to_enkephalin, make_enkephalin_module
 from tasks.base.retry_monitor import retry_monitor
 from tasks.base.script_task_scheme import (
-    Buy_enkephalin,
+    InfiniteBattle_task,
     Mirror_task,
     ProductionModule_task,
-     _batch_combat,
+    _batch_combat,
     init_game,
     onetime_EXP_process,
     onetime_thread_process,
@@ -115,9 +117,8 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
         "floor_3_exit",
         "infinite_dungeons",
         "save_rewards",
-        "screenshot_interval",
-        "mouse_action_interval",
-        "task_stall_timeout",
+        "hard_mirror_single_bonuses",
+        "select_event_pack",
         "skip_event_pack",
         "re_claim_rewards",
         "not_skip_whitegossypium",
@@ -127,6 +128,7 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
         "mirror_keyboard_simple_pathfinding",
         "screenshot_interval",
         "mouse_action_interval",
+        "task_stall_timeout",
     ]
 
     for k in top_level_keys:
@@ -150,7 +152,7 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
                     pass
             cfg.unsaved_set_value(k, val)
 
-    # 镜牢队伍配置映射 (优先从 overrides 中读取 team_number，支持全量 1~40 编队)
+    # 镜牢队伍配置映射 (优先从 overrides 中读取 team_number，支持全量 1~40 编队与多队轮换队列)
     t_num = str(overrides.get("team_number", 1))
     if t_num not in cfg.config.teams:
         cfg.config.teams[t_num] = TeamSetting(team_number=int(t_num))
@@ -160,6 +162,16 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
             "team_system",
             "team_number",
             "shop_strategy",
+            "system_burn",
+            "system_bleed",
+            "system_tremor",
+            "system_rupture",
+            "system_poise",
+            "system_sinking",
+            "system_charge",
+            "system_slash",
+            "system_pierce",
+            "system_blunt",
             "do_not_heal",
             "do_not_buy",
             "do_not_fuse",
@@ -178,6 +190,8 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
             "defense_first_round",
             "defense_for_solo",
             "defense_for_solo_turns",
+            "fixed_team_use",
+            "fixed_team_use_select",
             "reward_cards",
             "reward_cards_select",
             "after_level_IV",
@@ -190,6 +204,7 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
             "second_system",
             "second_system_select",
             "second_system_setting",
+            "observe_ego_gift",
             "skill_replacement",
             "skill_replacement_select",
             "skill_replacement_mode",
@@ -215,8 +230,82 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
                         pass
                 setattr(team, tk, val)
 
-        mode = overrides.get("sinner_order_mode")
-        if mode == "pick":
+        # 当开局饰品体系设为 -1 (跟随队伍主体系) 时自动同步
+        if int(overrides.get("opening_items_system", team.opening_items_system)) < 0:
+            team.opening_items_system = team.team_system
+
+        # 当『出四级饰品后策略』选择『合成第二体系四级饰品 (after_level_IV_select == 2)』时自动启用第二体系
+        if team.after_level_IV and team.after_level_IV_select == 2:
+            team.second_system = True
+
+        # 第二体系行动模式预设映射 (合成四级 / 购买 / 选奖励卡 / 升级四级)
+        sec_preset = overrides.get("second_system_action_preset")
+        if sec_preset == "all":
+            team.second_system_action = [1, 1, 1, 1]
+        elif sec_preset == "fuse_and_buy":
+            team.second_system_action = [1, 1, 1, 0]
+        elif sec_preset == "fuse_only":
+            team.second_system_action = [1, 0, 0, 0]
+        elif sec_preset == "buy_only":
+            team.second_system_action = [0, 1, 1, 0]
+        elif isinstance(overrides.get("second_system_action"), list) and len(overrides["second_system_action"]) == 4:
+            team.second_system_action = [int(x) for x in overrides["second_system_action"]]
+
+        # 舍弃非本体系饰品快捷策略
+        discard_mode = overrides.get("discard_other_systems_mode")
+        if discard_mode == "discard_all_others":
+            primary_sys = all_systems.get(team.team_system, "burn")
+            sec_sys = all_systems.get(team.second_system_select, "") if team.second_system else ""
+            for sys_name in all_systems.values():
+                setattr(team, f"system_{sys_name}", sys_name not in (primary_sys, sec_sys))
+        elif discard_mode == "none":
+            for sys_name in all_systems.values():
+                setattr(team, f"system_{sys_name}", False)
+
+        # 开局星光加成预设
+        bonus_preset = overrides.get("opening_bonus_preset")
+        if bonus_preset == "all_3":
+            team.opening_bonus = [3] * 10
+        elif bonus_preset == "all_2":
+            team.opening_bonus = [2] * 10
+        elif bonus_preset == "all_1":
+            team.opening_bonus = [1] * 10
+        elif bonus_preset == "first4_1":
+            team.opening_bonus = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+        elif bonus_preset == "none":
+            team.opening_bonus = [0] * 10
+        elif isinstance(overrides.get("opening_bonus"), list) and len(overrides["opening_bonus"]) == 10:
+            team.opening_bonus = [int(x) for x in overrides["opening_bonus"]]
+
+        # 观测 E.G.O 饰品字符串解析 (例如 "bleed_3_1_1,burn_2_1_2")
+        if "observe_ego_gift_str" in overrides and overrides["observe_ego_gift_str"] is not None:
+            raw_obs = str(overrides["observe_ego_gift_str"]).replace("，", ",").strip()
+            if raw_obs:
+                team.observe_ego_gift_selected = [x.strip() for x in raw_obs.split(",") if x.strip()][:3]
+            elif not overrides.get("observe_ego_gift"):
+                team.observe_ego_gift_selected = []
+
+        # 忽略指定楼层商店预设
+        ignore_preset = overrides.get("ignore_shop_preset")
+        if ignore_preset == "none":
+            team.ignore_shop = [0, 0, 0, 0, 0]
+        elif ignore_preset == "floor_1":
+            team.ignore_shop = [1, 0, 0, 0, 0]
+        elif ignore_preset == "floor_1_2":
+            team.ignore_shop = [1, 1, 0, 0, 0]
+        elif ignore_preset == "floor_5":
+            team.ignore_shop = [0, 0, 0, 0, 1]
+        elif isinstance(overrides.get("ignore_shop"), list) and len(overrides["ignore_shop"]) == 5:
+            team.ignore_shop = [int(x) for x in overrides["ignore_shop"]]
+
+        # 罪人出战顺位模式处理
+        mode = overrides.get("sinner_order_mode", "keep")
+        if mode == "keep":
+            # 保持游戏内原有罪人选择与顺位（Mirror.run 检测到全0时跳过清空重选）
+            team.sinner_order = [0] * 12
+            team.chosen_sinners = [0] * 12
+            team.sinners_be_select = 0
+        elif mode == "pick":
             # 逐席位指定 1~12 号首发与全部后备替补人选
             ranks = [
                 int(overrides.get(f"sinner_rank_{r}", 0))
@@ -237,27 +326,28 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
                 team.sinner_order = order
                 team.chosen_sinners = [1] * 12
                 team.sinners_be_select = 12
-        elif mode == "text" or ("sinner_order_str" in overrides and overrides["sinner_order_str"]):
+        elif mode == "text" or ("sinner_order_str" in overrides and str(overrides["sinner_order_str"]).strip()):
             order = _parse_sinner_order(str(overrides.get("sinner_order_str", "")))
             team.sinner_order = order
             team.chosen_sinners = [1 if x > 0 else 0 for x in order]
             team.sinners_be_select = sum(team.chosen_sinners)
-        elif mode == "keep":
-            if all(x == 0 for x in team.sinner_order):
-                team.sinner_order = list(range(1, 13))
-                team.chosen_sinners = [1] * 12
-                team.sinners_be_select = 12
-        elif all(x == 0 for x in team.sinner_order):
-            team.sinner_order = list(range(1, 13))
-            team.chosen_sinners = [1] * 12
-            team.sinners_be_select = 12
 
-    active_team_int = int(t_num)
-    if active_team_int not in cfg.teams_active_queue:
-        cfg.set_team_enabled(active_team_int, True)
-    else:
-        cfg.save()
+    # 构建镜牢执行队伍队列（支持多队伍轮换队列 teams_rotation_str，或将当前选中编队置为唯一/队首）
+    rotation_str = str(overrides.get("teams_rotation_str", "") or "").replace("，", ",").strip()
+    rotation_queue: list[int] = []
+    if rotation_str and overrides.get("mirror_team_mode") == "rotation":
+        for part in rotation_str.split(","):
+            if part.strip().isdigit():
+                num = int(part.strip())
+                if 1 <= num <= 40 and num not in rotation_queue:
+                    rotation_queue.append(num)
+                    if str(num) not in cfg.config.teams:
+                        cfg.config.teams[str(num)] = TeamSetting(team_number=num)
+    if not rotation_queue:
+        rotation_queue = [int(t_num)]
 
+    cfg._sync_legacy_team_state(rotation_queue)
+    cfg.save()
 
 def execute_aalc_task(task_type: str, params: dict[str, Any]) -> bool:
     """根据 task_type 执行对应的完整 AALC 业务逻辑"""
@@ -363,6 +453,13 @@ def execute_aalc_task(task_type: str, params: dict[str, Any]) -> bool:
         return ProductionModule_task(
             kill_game_while_waiting=bool(params.get("tool_kill_game_waiting", False)),
             max_cycles=int(params.get("tool_production_cycles", 1)),
+        )
+
+    if task_type == "infinite_battle_tool":
+        return InfiniteBattle_task(
+            defense=bool(params.get("tool_infinite_defense", False)),
+            defense_on_turn1=bool(params.get("tool_defense_turn1", False)),
+            choice_event_handling=bool(params.get("tool_handle_events", True)),
         )
 
     raise ValueError(f"未知的 AALC 任务类型: {task_type}")
