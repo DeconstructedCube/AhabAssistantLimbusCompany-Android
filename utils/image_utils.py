@@ -1,8 +1,110 @@
 import os
 
-import cv2
-import numpy as np
-from cv2 import createCLAHE
+try:
+    import cv2
+    from cv2 import createCLAHE
+except ImportError:
+    class _FakeCLAHE:
+        def apply(self, img):
+            return img
+
+    def createCLAHE(*args, **kwargs):
+        return _FakeCLAHE()
+
+    class _MiniCv2Fallback:
+        INTER_AREA = 3
+        INTER_LINEAR = 1
+        TM_CCOEFF_NORMED = 5
+        COLOR_RGB2GRAY = 6
+        COLOR_RGBA2BGR = 4
+        COLOR_RGBA2GRAY = 11
+        BORDER_CONSTANT = 0
+        THRESH_BINARY = 0
+        MORPH_RECT = 0
+        MORPH_CLOSE = 3
+        CC_STAT_AREA = 4
+
+        @staticmethod
+        def resize(src, dsize, fx=None, fy=None, interpolation=1):
+            h, w = src.shape[:2]
+            if dsize is not None and dsize != (0, 0):
+                nw, nh = dsize
+            else:
+                nw = max(1, int(round(w * fx)))
+                nh = max(1, int(round(h * fy)))
+            im = Image.fromarray(src)
+            res = im.resize((nw, nh), Image.Resampling.BILINEAR if interpolation == 1 else Image.Resampling.BOX)
+            return np.array(res)
+
+        @staticmethod
+        def cvtColor(src, code):
+            if code in (6, 11):
+                if src.ndim == 2:
+                    return src
+                r = src[:, :, 0].astype(np.float32)
+                g = src[:, :, 1].astype(np.float32)
+                b = src[:, :, 2].astype(np.float32)
+                return (0.299 * r + 0.587 * g + 0.114 * b).astype(np.uint8)
+            elif code == 4:
+                return src[:, :, [2, 1, 0]]
+            return src
+
+        @staticmethod
+        def copyMakeBorder(src, top, bottom, left, right, borderType=0, value=0):
+            pad_spec = ((top, bottom), (left, right)) if src.ndim == 2 else ((top, bottom), (left, right), (0, 0))
+            return np.pad(src, pad_spec, mode="constant", constant_values=value)
+
+        @staticmethod
+        def minMaxLoc(res):
+            min_val = float(np.min(res))
+            max_val = float(np.max(res))
+            min_loc_idx = np.unravel_index(np.argmin(res), res.shape)
+            max_loc_idx = np.unravel_index(np.argmax(res), res.shape)
+            return min_val, max_val, (int(min_loc_idx[1]), int(min_loc_idx[0])), (int(max_loc_idx[1]), int(max_loc_idx[0]))
+
+        @staticmethod
+        def inRange(src, lowerb, upperb):
+            cond = ((src >= lowerb) & (src <= upperb)).all(axis=-1) if src.ndim == 3 else ((src >= lowerb) & (src <= upperb))
+            return cond.astype(np.uint8) * 255
+
+        @staticmethod
+        def bitwise_not(src):
+            return ~src
+
+        @staticmethod
+        def threshold(src, thresh, maxval, type=0):
+            return float(thresh), np.where(src > thresh, maxval, 0).astype(np.uint8)
+
+        @staticmethod
+        def matchTemplate(image, template, method=5):
+            ih, iw = image.shape[:2]
+            th, tw = template.shape[:2]
+            out_h = ih - th + 1
+            out_w = iw - tw + 1
+            if out_h <= 0 or out_w <= 0:
+                return np.zeros((1, 1), dtype=np.float32)
+            img_f = image.astype(np.float32)
+            tpl_f = template.astype(np.float32)
+            tpl_mean = np.mean(tpl_f)
+            tpl_zero = tpl_f - tpl_mean
+            tpl_norm = np.sqrt(np.sum(tpl_zero ** 2))
+            if tpl_norm == 0:
+                return np.zeros((out_h, out_w), dtype=np.float32)
+
+            shape = (out_h, out_w, th, tw)
+            strides = (img_f.strides[0], img_f.strides[1], img_f.strides[0], img_f.strides[1])
+            windows = np.lib.stride_tricks.as_strided(img_f, shape=shape, strides=strides)
+            win_means = np.mean(windows, axis=(2, 3), keepdims=True)
+            win_zero = windows - win_means
+            win_norms = np.sqrt(np.sum(win_zero ** 2, axis=(2, 3)))
+            dot_prod = np.sum(win_zero * tpl_zero, axis=(2, 3))
+            denom = win_norms * tpl_norm
+            corr = np.zeros((out_h, out_w), dtype=np.float32)
+            valid = denom > 1e-5
+            corr[valid] = dot_prod[valid] / denom[valid]
+            return corr
+
+    cv2 = _MiniCv2Fallback()
 from PIL import Image
 
 from module.config import cfg

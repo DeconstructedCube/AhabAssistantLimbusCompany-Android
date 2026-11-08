@@ -6,7 +6,7 @@ from pathlib import Path
 from time import localtime, strftime, time
 from typing import Any, Optional
 
-from pydantic import BaseModel, ValidationError
+from .config_typing import BaseModel, ValidationError
 from ruamel.yaml import YAML, YAMLError
 
 from module.after_completion_types import (

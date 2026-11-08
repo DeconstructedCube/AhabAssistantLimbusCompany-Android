@@ -117,8 +117,9 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
         "floor_3_exit",
         "infinite_dungeons",
         "save_rewards",
-        "hard_mirror_single_bonuses",
-        "select_event_pack",
+        "screenshot_interval",
+        "mouse_action_interval",
+        "task_stall_timeout",
         "skip_event_pack",
         "re_claim_rewards",
         "not_skip_whitegossypium",
@@ -225,6 +226,9 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
             team.sinners_be_select = 12
 
     if not cfg.teams_active_queue:
+        if "opening_bonus_preset" in overrides and overrides["opening_bonus_preset"] is not None:
+            preset_val = int(overrides["opening_bonus_preset"])
+            team.opening_bonus = [preset_val] * 10
         cfg.set_team_enabled(1, True)
     else:
         cfg.save()

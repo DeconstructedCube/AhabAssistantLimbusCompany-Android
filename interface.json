@@ -80,7 +80,11 @@
                 "PrioritizeSkill3",
                 "Floor3Exit",
                 "InfiniteDungeons",
-                "SaveHardRewards"
+                "SaveHardRewards",
+                "OpeningBonusPreset",
+                "ShopAdvancedFusing",
+                "TaskStallTimeoutOption",
+                "PerformanceIntervals"
             ]
         },
         {
@@ -180,7 +184,11 @@
                 "SkillReplacementOption",
                 "MaxKeywordRefresh",
                 "MaxNormalRefresh",
-                "UseTeamCodeOption"
+                "UseTeamCodeOption",
+                "OpeningBonusPreset",
+                "ShopAdvancedFusing",
+                "TaskStallTimeoutOption",
+                "PerformanceIntervals"
             ]
         },
         {
@@ -1966,6 +1974,209 @@
                     }
                 }
             }
+        },
+        "OpeningBonusPreset": {
+            "type": "select",
+            "label": "开局星芒增益预设",
+            "default_case": "LevelPlusPlus",
+            "cases": [
+                {
+                    "name": "LevelPlusPlus",
+                    "label": "全选 ++ (加成最高)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "opening_bonus_preset": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "LevelPlus",
+                    "label": "全选 + (中等加成)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "opening_bonus_preset": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "LevelBase",
+                    "label": "全选基础加成 (省星光)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "opening_bonus_preset": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "LevelZero",
+                    "label": "全部不选 (0)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "opening_bonus_preset": 0
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "TaskStallTimeoutOption": {
+            "type": "select",
+            "label": "页面卡死看门狗重启等待时间",
+            "default_case": "Sec90",
+            "cases": [
+                {
+                    "name": "Sec60",
+                    "label": "60 秒 (快速恢复)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "task_stall_timeout": 60
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sec90",
+                    "label": "90 秒 (推荐默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "task_stall_timeout": 90
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sec120",
+                    "label": "120 秒 (网络较慢时)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "task_stall_timeout": 120
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sec180",
+                    "label": "180 秒 (极慢设备防误判)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "task_stall_timeout": 180
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "PerformanceIntervals": {
+            "type": "select",
+            "label": "运行速度与轮询性能档位",
+            "default_case": "Balanced",
+            "cases": [
+                {
+                    "name": "Fast",
+                    "label": "极速档 (截图 0.5s / 触控 0.3s) - 推荐高配手机",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "screenshot_interval": 0.5,
+                                "mouse_action_interval": 0.3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Balanced",
+                    "label": "均衡档 (截图 0.85s / 触控 0.5s) - 默认稳定",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "screenshot_interval": 0.85,
+                                "mouse_action_interval": 0.5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "PowerSave",
+                    "label": "省电档 (截图 1.2s / 触控 0.6s) - 低发热长时挂机",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "screenshot_interval": 1.2,
+                                "mouse_action_interval": 0.6
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ShopAdvancedFusing": {
+            "type": "select",
+            "label": "商店合成进阶微操",
+            "default_case": "Standard",
+            "cases": [
+                {
+                    "name": "Standard",
+                    "label": "标准合成逻辑 (默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "only_aggressive_fuse": false,
+                                "only_system_fuse": false,
+                                "do_not_system_fuse": false,
+                                "aggressive_also_enhance": false,
+                                "aggressive_save_systems": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "AggressiveWithSave",
+                    "label": "四级激进合成 + 保护本体系饰品",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "only_aggressive_fuse": true,
+                                "aggressive_save_systems": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "AggressiveWithEnhance",
+                    "label": "四级激进合成 + 期间也升级饰品",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "only_aggressive_fuse": true,
+                                "aggressive_also_enhance": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "OnlySystemFuse",
+                    "label": "只合成体系饰品",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "only_system_fuse": true,
+                                "do_not_system_fuse": false
+                            }
+                        }
+                    }
+                }
+            ]
         }
     }
 }

@@ -11,6 +11,7 @@ include:
   - assets/config/**
   - assets/images/**
   - assets/model/**
+  - assets/logo/**
   - resource/**
   - LICENSE
 

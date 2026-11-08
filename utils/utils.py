@@ -6,7 +6,10 @@ from datetime import datetime, time, timedelta
 from time import sleep
 from zoneinfo import ZoneInfo  # Python 3.9+ 内置模块
 
-import cv2
+try:
+    import cv2
+except ImportError:
+    from utils.image_utils import cv2
 import numpy as np
 try:
     import win32crypt
