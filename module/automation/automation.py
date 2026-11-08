@@ -10,7 +10,10 @@ from typing import Any
 
 import cv2
 import numpy as np
-import psutil
+try:
+    import psutil
+except ImportError:
+    psutil = None
 from PIL.Image import Image
 
 from utils.image_utils import ImageUtils
@@ -64,7 +67,14 @@ class Automation(metaclass=SingletonMeta):
         if self.input_handler:
             self.input_handler = None
         if cfg.simulator:
-            if cfg.simulator_type == 0:
+            from .input_handlers.maa_control import MaaControl
+
+            if MaaControl.connection_device is not None or cfg.simulator_type == 2:
+                log.debug("使用MaaControl原生/副屏输入模块")
+                if MaaControl.connection_device is None:
+                    MaaControl()
+                self.input_handler = MaaControl.connection_device
+            elif cfg.simulator_type == 0:
                 from .input_handlers.simulator.mumu_control import MumuControl
 
                 log.debug("使用MuMu模拟器输入模块")
@@ -375,22 +385,16 @@ class Automation(metaclass=SingletonMeta):
             time.sleep(1)
             if time.time() - start_time > 60:
                 log.error("截图超时，尝试重启游戏")
-                import os
-
-                import win32process
-
-                from module.game_and_screen import screen
+                from tasks.base.retry import kill_game
 
                 try:
-                    _, pid = win32process.GetWindowThreadProcessId(screen.handle.hwnd)
-                    os.system(f"taskkill /F /PID {pid}")
-                except:
+                    kill_game()
+                except Exception:
                     pass
                 from tasks.base.script_task_scheme import init_game
 
                 init_game()
                 start_time = time.time()
-
     def find_element(
         self,
         target,
@@ -816,14 +820,13 @@ class Automation(metaclass=SingletonMeta):
         在当前截图中查找目标图像的位置
         """
         try:
-            if self.memory_protection:
+            if self.memory_protection and psutil is not None:
                 memory = psutil.virtual_memory()
                 # memory.percent 直接返回当前已使用的百分比 (0.0 到 100.0)
                 current_percent = memory.percent
                 if current_percent > 90:
                     log.debug(f"当前系统内存总占用率: {current_percent}%，释放图片缓存")
                     self.clear_img_cache()
-
             existing_paths = ImageUtils.existing_image_paths(target)
             if not existing_paths:
                 log.error(f"未找到图片： {target} ")

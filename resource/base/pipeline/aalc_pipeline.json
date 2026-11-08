@@ -1,0 +1,156 @@
+{
+    "AALC_ConfigHolder": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "attach": {
+            "daily_task": true,
+            "set_EXP_count": 1,
+            "set_thread_count": 3,
+            "daily_teams": 1,
+            "use_continuous_combat": false,
+            "use_continuous_combat_select": 1,
+            "get_reward": true,
+            "set_get_prize": 0,
+            "buy_enkephalin": false,
+            "set_lunacy_to_enkephalin": 1,
+            "Dr_Grandet_mode": false,
+            "skip_enkephalin": false,
+            "mirror": false,
+            "set_mirror_count": 1,
+            "hard_mirror": false,
+            "auto_hard_mirror": false,
+            "no_weekly_bonuses": false,
+            "floor_3_exit": false,
+            "infinite_dungeons": false,
+            "save_rewards": false,
+            "hard_mirror_single_bonuses": false,
+            "select_event_pack": false,
+            "skip_event_pack": false,
+            "re_claim_rewards": false,
+            "not_skip_whitegossypium": false,
+            "fight_to_last_man": false,
+            "select_team_by_order": false,
+            "mirror_keyboard_navigation": false,
+            "mirror_keyboard_simple_pathfinding": false,
+            "team_system": 0,
+            "team_number": 1,
+            "shop_strategy": 1,
+            "sinner_order_str": "1,2,3,4,5,6,7,8,9,10,11,12",
+            "do_not_heal": false,
+            "do_not_buy": false,
+            "do_not_fuse": false,
+            "do_not_sell": false,
+            "do_not_enhance": false,
+            "only_aggressive_fuse": false,
+            "do_not_system_fuse": false,
+            "only_system_fuse": false,
+            "avoid_skill_3": false,
+            "prioritize_skill_3": false,
+            "re_formation_each_floor": false,
+            "normal_to_hard_floor": 0,
+            "use_starlight": false,
+            "aggressive_also_enhance": false,
+            "aggressive_save_systems": false,
+            "defense_first_round": false,
+            "defense_for_solo": false,
+            "defense_for_solo_turns": 5,
+            "reward_cards": false,
+            "reward_cards_select": 0,
+            "after_level_IV": false,
+            "after_level_IV_select": 0,
+            "shopping_strategy": false,
+            "shopping_strategy_select": 0,
+            "opening_items": false,
+            "opening_items_select": 0,
+            "opening_items_system": 0,
+            "second_system": false,
+            "second_system_select": 0,
+            "second_system_setting": 0,
+            "skill_replacement": false,
+            "skill_replacement_select": 0,
+            "skill_replacement_mode": 0,
+            "max_keyword_refresh": 1,
+            "max_normal_refresh": 1,
+            "use_custom_theme_pack_weight": false,
+            "use_team_code": false,
+            "team_code": "",
+            "tool_infinite_defense": false,
+            "tool_defense_turn1": false,
+            "tool_handle_events": true,
+            "tool_kill_game_waiting": false,
+            "tool_production_cycles": 1
+        }
+    },
+    "AALC_FullScriptTask": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "AALCRunTask",
+        "custom_action_param": {
+            "task_type": "full_script"
+        }
+    },
+    "AALC_StartAndBackHome": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "AALCRunTask",
+        "custom_action_param": {
+            "task_type": "start_and_home"
+        }
+    },
+    "AALC_EnkephalinTask": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "AALCRunTask",
+        "custom_action_param": {
+            "task_type": "enkephalin"
+        }
+    },
+    "AALC_ExpLuxcavationTask": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "AALCRunTask",
+        "custom_action_param": {
+            "task_type": "exp_luxcavation"
+        }
+    },
+    "AALC_ThreadLuxcavationTask": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "AALCRunTask",
+        "custom_action_param": {
+            "task_type": "thread_luxcavation"
+        }
+    },
+    "AALC_ClaimRewardsTask": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "AALCRunTask",
+        "custom_action_param": {
+            "task_type": "claim_rewards"
+        }
+    },
+    "AALC_MirrorDungeonTask": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "AALCRunTask",
+        "custom_action_param": {
+            "task_type": "mirror_dungeon"
+        }
+    },
+    "AALC_InfiniteBattleTool": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "AALCRunTask",
+        "custom_action_param": {
+            "task_type": "infinite_battle_tool"
+        }
+    },
+    "AALC_ProductionModuleTool": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "AALCRunTask",
+        "custom_action_param": {
+            "task_type": "production_module_tool"
+        }
+    }
+}

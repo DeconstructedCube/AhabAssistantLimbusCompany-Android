@@ -5,11 +5,56 @@ from collections import deque
 from copy import deepcopy
 from pathlib import Path
 from threading import Lock
+from logging.handlers import RotatingFileHandler
 
 import colorlog
-from concurrent_log_handler import ConcurrentRotatingFileHandler
-from PySide6.QtCore import QObject, Signal
-from PySide6.QtWidgets import QApplication
+try:
+    from concurrent_log_handler import ConcurrentRotatingFileHandler
+except ImportError:
+    ConcurrentRotatingFileHandler = RotatingFileHandler
+try:
+    from PySide6.QtCore import QObject, Signal
+    from PySide6.QtWidgets import QApplication
+except ImportError:
+    class _BoundSignal:
+        def __init__(self):
+            self._callbacks = []
+
+        def connect(self, cb):
+            if cb not in self._callbacks:
+                self._callbacks.append(cb)
+
+        def emit(self, *args, **kwargs):
+            for cb in list(self._callbacks):
+                try:
+                    cb(*args, **kwargs)
+                except Exception:
+                    pass
+
+    class Signal:
+        def __init__(self, *types):
+            self._name = ""
+
+        def __set_name__(self, owner, name):
+            self._name = f"_sig_{name}"
+
+        def __get__(self, instance, owner=None):
+            if instance is None:
+                return self
+            sig = getattr(instance, self._name, None)
+            if sig is None:
+                sig = _BoundSignal()
+                setattr(instance, self._name, sig)
+            return sig
+
+    class QObject:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class QApplication:
+        @staticmethod
+        def translate(context: str, text: str) -> str:
+            return text
 from ruamel.yaml import YAML
 
 from module import CONFIG_PATH, VERSION_PATH

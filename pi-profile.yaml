@@ -1,0 +1,60 @@
+# MaaFwApp Android APK 打包配方 (pi-profile.yaml)
+assets: .
+
+include:
+  - interface.json
+  - agent/**
+  - app/**
+  - module/**
+  - tasks/**
+  - utils/**
+  - assets/config/**
+  - assets/images/**
+  - assets/model/**
+  - resource/**
+  - LICENSE
+
+exclude:
+  - "**/__pycache__/**"
+  - "**/*.pyc"
+  - "module/automation/input_handlers/simulator/pyminitouch/**"
+
+app:
+  id: aalc
+  label: AALC 边狱巴士助手
+  icon: assets/logo/my_icon.png
+
+logs:
+  include:
+    - debug/**/*.log
+    - logs/**/*.log
+
+display:
+  foreground: true
+  presets:
+    - label: 1080P (推荐·原生模板对齐)
+      width: 1920
+      height: 1080
+      dpi: 280
+    - label: 720P (低内存省电)
+      width: 1280
+      height: 720
+      dpi: 213
+
+agent:
+  sourceDir: ./agent-dist
+  abi:
+    - arm64-v8a
+  runtimes:
+    - location: bundle
+      executable: bin/python3
+      name: aalc-agent
+      args:
+        - -u
+        - agent/main.py
+      env:
+        PYTHONHOME: "{bundle}/prefix"
+        PYTHONPATH: "{bundle}/site-packages/pure.zip:{bundle}/site-packages:{projectDir}"
+        LD_LIBRARY_PATH: "{bundle}/prefix/lib:{bundle}/site-packages/chaquopy/lib:{nativeLibs}"
+        MAAFW_BINARY_PATH: "{nativeLibs}"
+        SSL_CERT_FILE: "{bundle}/site-packages/certifi/cacert.pem"

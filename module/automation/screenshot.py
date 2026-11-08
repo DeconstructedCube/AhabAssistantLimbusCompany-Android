@@ -1,10 +1,23 @@
 import time
-from ctypes import windll
+try:
+    from ctypes import windll
+except ImportError:
+    windll = None
 
-import pyautogui
-import pywintypes
-import win32gui
-import win32ui
+try:
+    import pyautogui
+except ImportError:
+    pyautogui = None
+try:
+    import pywintypes
+    import win32gui
+    import win32ui
+except ImportError:
+    class _PyWinTypesFallback:
+        error = Exception
+    pywintypes = _PyWinTypesFallback()
+    win32gui = None
+    win32ui = None
 from PIL import Image
 
 from module.config import cfg
@@ -24,7 +37,17 @@ class ScreenShot:
             PIL.Image: 截图图像
         """
         if cfg.simulator:
-            if cfg.simulator_type == 0:
+            from module.automation.input_handlers.maa_control import MaaControl
+
+            if MaaControl.connection_device is not None or cfg.simulator_type == 2:
+                try:
+                    return ScreenShot.maa_screenshot(gray)
+                except userStopError:
+                    raise
+                except Exception as e:
+                    log.debug(f"MaaControl截图报错 {type(e).__name__}: {e}")
+                    return None
+            elif cfg.simulator_type == 0:
                 try:
                     return ScreenShot.mumu_screenshot(gray)
                 except userStopError:
@@ -340,6 +363,19 @@ class ScreenShot:
             log.error("未连接到MuMu模拟器")
             raise ConnectionError("未连接到MuMu模拟器")
 
+
+    @staticmethod
+    def maa_screenshot(gray: bool = True) -> Image.Image:
+        """通过 MaaControl (MaaFramework Controller 或 Android 虚拟副屏) 获取 1920x1080 截图"""
+        from module.automation.input_handlers.maa_control import MaaControl
+
+        if MaaControl.connection_device is None:
+            MaaControl()
+        image = MaaControl.connection_device.screenshot()
+        pil_img = Image.fromarray(image)
+        if gray:
+            pil_img = pil_img.convert("L")
+        return pil_img
     @staticmethod
     def adb_screenshot(gray: bool = True) -> Image.Image:
         """

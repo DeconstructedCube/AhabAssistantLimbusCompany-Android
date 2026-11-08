@@ -47,13 +47,21 @@ except ImportError:
     from module.logger import log
 
 import sys
-import winreg
+try:
+    import winreg
+except ImportError:
+    winreg = None
 from enum import Enum
 from pathlib import Path
 from typing import Callable
 
-from PySide6.QtWidgets import QApplication
-
+try:
+    from PySide6.QtWidgets import QApplication
+except ImportError:
+    class QApplication:
+        @staticmethod
+        def translate(context: str, text: str) -> str:
+            return text
 from app import mediator
 
 APPID = "AALC_Notification"
@@ -265,7 +273,8 @@ def send_toast(
     Returns:
         bool: 发送是否成功
     """
-    if IMPORT_SUCCESS is False:
+    if IMPORT_SUCCESS is False or winreg is None:
+        log.info(f"[{title}] {msg}")
         return True
     if template is not TemplateToast.NoneTemplate:
         title = QApplication.translate("WindowsToast", title)

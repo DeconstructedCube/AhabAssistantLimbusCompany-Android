@@ -406,9 +406,51 @@ def search_road_from_road_map(hard_mode=False):
 # risky_encounter 是精锐遭遇战（链式战），shop 是商店，abnormality_focused_encounter 是异想体集中遭遇战
 
 
+_yolo_node_session = None
+
+
+class _Cv2DnnSessionAdapter:
+    class _InputMeta:
+        name = "images"
+
+    def __init__(self, model_path: str):
+        self._net = cv2.dnn.readNetFromONNX(model_path)
+
+    def get_inputs(self):
+        return [self._InputMeta()]
+
+    def run(self, _, feed_dict):
+        blob = next(iter(feed_dict.values()))
+        self._net.setInput(blob)
+        return [self._net.forward()]
+
+
+def _get_yolo_node_session():
+    global _yolo_node_session
+    if _yolo_node_session is None:
+        try:
+            import onnxruntime as ort
+
+            sess_opts = ort.SessionOptions()
+            sess_opts.intra_op_num_threads = 4
+            sess_opts.inter_op_num_threads = 2
+            sess_opts.enable_cpu_mem_arena = False
+            avail = ort.get_available_providers()
+            providers = []
+            if "XnnpackExecutionProvider" in avail:
+                providers.append(("XnnpackExecutionProvider", {"intra_op_num_threads": "4"}))
+            providers.append("CPUExecutionProvider")
+            _yolo_node_session = ort.InferenceSession(
+                "./assets/model/best.onnx",
+                sess_options=sess_opts,
+                providers=providers,
+            )
+        except ImportError:
+            _yolo_node_session = _Cv2DnnSessionAdapter("./assets/model/best.onnx")
+    return _yolo_node_session
+
 def identify_nodes(bus_x):
     import numpy as np
-    import onnxruntime as ort
 
     model_input_height = 544
     model_input_width = 960
@@ -425,9 +467,7 @@ def identify_nodes(bus_x):
     if auto.take_screenshot(gray=False) is None:
         return None
     original = np.array(auto.screenshot)
-    session = ort.InferenceSession("./assets/model/best.onnx")
-
-    # 等比例缩放并填充到模型输入尺寸；保留比例和偏移以便还原检测框坐标。
+    session = _get_yolo_node_session()
     height, width = original.shape[:2]
     image_scale = min(model_input_width / width, model_input_height / height)
     resized_width = round(width * image_scale)

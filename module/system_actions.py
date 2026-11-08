@@ -144,11 +144,12 @@ def apply_power_keep_awake(enable: bool) -> None:
 def _action_exit_game() -> None:
     from module.game_and_screen import game_process, screen
 
-    if os.name != "nt":
-        log.info("跳过退出游戏：仅支持 Windows")
-        return
-
     if cfg.get_value("simulator", False):
+        from module.automation.input_handlers.maa_control import MaaControl
+        if MaaControl.connection_device is not None:
+            MaaControl.connection_device.close_current_app()
+            log.info("已执行：退出游戏（MaaControl/Android）")
+            return
         if cfg.get_value("simulator_type", 0) == 0:
             from module.automation.input_handlers.simulator.mumu_control import (
                 MumuControl,
@@ -166,6 +167,9 @@ def _action_exit_game() -> None:
         log.info("已执行：退出游戏（模拟器）")
         return
 
+    if os.name != "nt":
+        log.info("跳过退出游戏：桌面模式仅支持 Windows")
+        return
     if not game_process.check_game_alive():
         log.info("跳过退出游戏：游戏进程未运行")
         return

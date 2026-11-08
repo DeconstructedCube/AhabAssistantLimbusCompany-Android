@@ -2,13 +2,50 @@ import random
 from time import sleep, time
 from typing import overload
 
-import pyautogui
-import pyperclip
-import win32api
-import win32con
-import win32gui
-from pywintypes import error as PyWinTypesError
+try:
+    import pyautogui
+except ImportError:
+    pyautogui = None
+try:
+    import pyperclip
+except ImportError:
+    pyperclip = None
+try:
+    import win32api
+    import win32con
+    import win32gui
+    from pywintypes import error as PyWinTypesError
+except ImportError:
+    win32api = None
+    win32gui = None
+    PyWinTypesError = Exception
 
+    class _Win32ConFallback:
+        VK_RETURN = 0x0D
+        VK_ESCAPE = 0x1B
+        VK_SPACE = 0x20
+        VK_TAB = 0x09
+        VK_SHIFT = 0x10
+        VK_CONTROL = 0x11
+        VK_MENU = 0x12
+        VK_UP = 0x26
+        VK_DOWN = 0x28
+        VK_LEFT = 0x25
+        VK_RIGHT = 0x27
+        VK_HOME = 0x24
+        VK_END = 0x23
+        VK_PRIOR = 0x21
+        VK_NEXT = 0x22
+        VK_INSERT = 0x2D
+        VK_DELETE = 0x2E
+        VK_LCONTROL = 0xA2
+        VK_RCONTROL = 0xA3
+        VK_LMENU = 0xA4
+        VK_RMENU = 0xA5
+        VK_LWIN = 0x5B
+        VK_RWIN = 0x5C
+
+    win32con = _Win32ConFallback()
 from module.config import cfg
 from utils.singletonmeta import SingletonMeta
 
@@ -141,9 +178,8 @@ class WinAbstractInput(AbstractInput):
 class Input(WinAbstractInput, metaclass=SingletonMeta):
     """基于 `pyautogui` 的输入类, 仅支持前台操作"""
 
-    # 禁用pyautogui的失败安全特性，防止意外中断
-    pyautogui.FAILSAFE = False
-
+    if pyautogui is not None:
+        pyautogui.FAILSAFE = False
     @overload
     def pos_offset(self, x: int, y: int) -> tuple[int, int]: ...
     @overload

@@ -3,9 +3,14 @@ import platform
 import time
 from time import sleep
 
-import psutil
-import win32process
-
+try:
+    import psutil
+except ImportError:
+    psutil = None
+try:
+    import win32process
+except ImportError:
+    win32process = None
 from module.automation import auto
 from module.config import cfg
 from module.game_and_screen import screen
@@ -29,7 +34,11 @@ def ensure_simulator_game_started() -> bool:
         return False
     _last_simulator_alive_check_time = now
 
-    if cfg.simulator_type == 0:
+    from module.automation.input_handlers.maa_control import MaaControl
+
+    if MaaControl.connection_device is not None or cfg.simulator_type == 2:
+        connection_device = MaaControl.connection_device
+    elif cfg.simulator_type == 0:
         from module.automation.input_handlers.simulator.mumu_control import (
             MumuControl,
         )
@@ -77,7 +86,11 @@ def click_title_screen_safely() -> None:
 def kill_game():
     """关闭游戏"""
     if cfg.simulator:
-        if cfg.simulator_type == 0:
+        from module.automation.input_handlers.maa_control import MaaControl
+
+        if MaaControl.connection_device is not None or cfg.simulator_type == 2:
+            connection_device = MaaControl.connection_device
+        elif cfg.simulator_type == 0:
             from module.automation.input_handlers.simulator.mumu_control import (
                 MumuControl,
             )

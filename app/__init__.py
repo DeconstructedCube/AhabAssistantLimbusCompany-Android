@@ -1,6 +1,10 @@
 from enum import Enum
 
-from PySide6.QtCore import QT_TRANSLATE_NOOP
+try:
+    from PySide6.QtCore import QT_TRANSLATE_NOOP
+except ImportError:
+    def QT_TRANSLATE_NOOP(context: str, text: str) -> str:
+        return text
 
 from app.mediator import Mediator
 from module.config import cfg

@@ -1,0 +1,106 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build AALC Android Native APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout AALC Android Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Clone MaaFwApp GUI Wrapper
+        run: |
+          git clone --depth 1 https://github.com/Aliothmoon/MaaFwApp.git maafwapp
+
+      - name: Set up MaaFramework Native Binaries (arm64-v8a)
+        run: |
+          cd maafwapp
+          python scripts/setup_maa_framework.py --abi arm64-v8a
+
+      - name: Build Android CPython Agent Runtime
+        run: |
+          cd maafwapp
+          pip install packaging
+          python scripts/build_agent_bundle.py \
+            --out ../agent-dist \
+            --requirements ../requirements-android.txt \
+            --exclude pillow \
+            --require pillow==11.0.0 \
+            --extra-index-url https://chaquo.com/pypi-13.1/
+
+      - name: Configure MaaFwApp Profile
+        run: |
+          cd maafwapp
+          cat << 'EOF' > local.properties
+          pi.profile=../pi-profile.yaml
+          build.releaseAbi=arm64-v8a
+          EOF
+          cat local.properties
+
+      - name: Build Android Release APK with Gradle
+        run: |
+          cd maafwapp
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease --stacktrace --no-daemon
+
+      - name: Locate and Prepare Output APK
+        id: apk-path
+        run: |
+          APK_FILE=$(find maafwapp/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          if [ -z "$APK_FILE" ]; then
+            echo "Error: APK build failed, no APK found!"
+            exit 1
+          fi
+          echo "Found APK: $APK_FILE"
+          mkdir -p dist
+          cp -f "$APK_FILE" dist/AALC-Android-Release.apk
+          ls -lh dist/AALC-Android-Release.apk
+          echo "apk_path=dist/AALC-Android-Release.apk" >> $GITHUB_OUTPUT
+
+      - name: Upload APK to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AALC-Android-Release-APK
+          path: dist/AALC-Android-Release.apk
+          retention-days: 30
+
+      - name: Create GitHub Release on Tag
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/AALC-Android-Release.apk
+          name: AALC Android ${{ github.ref_name }}
+          body: |
+            ## AALC 边狱公司助手 (Android 原生版) ${{ github.ref_name }}
+            
+            基于 **MaaFramework** + **MaaFwApp** 强力驱动，在 Android 设备上原生稳定运行《边狱公司》日常采光、体力合成与全自动镜牢！
+            
+            ### 特性说明
+            - 🚀 **1920x1080 后台虚拟副屏**：借助 Shizuku 或 Root 在幕后独立虚拟显示器静默运行，完全不占据手机主屏幕！
+            - 🎯 **100% 完整还原 AALC 全部核心逻辑**：日常采光、连续战斗、邮件与通行证领奖、狂气换体（含葛朗台卡点模式）、全自动镜牢（YOLO寻路+卡包权重OCR+商店策略+自动战斗拉链）、亚哈代打工具与定时换饼。
+            - 📱 **纯真机原生执行**：脱离电脑与模拟器，手机直接开箱即用。
+          draft: false
+          prerelease: false

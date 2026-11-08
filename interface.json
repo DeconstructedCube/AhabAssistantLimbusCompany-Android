@@ -1,0 +1,1971 @@
+{
+    "interface_version": 2,
+    "name": "AALC_Android",
+    "label": "AALC 边狱巴士助手",
+    "version": "v2.5.0-android",
+    "welcome": "欢迎使用 AALC (AhabAssistantLimbusCompany) 安卓原生版！支持 1920x1080 后台虚拟副屏免打扰挂机，100% 完整还原 AALC 桌面版全部日常采光、体力合成、奖励领取与全自动镜牢逻辑。",
+    "contact": "https://github.com/KIYI671/AhabAssistantLimbusCompany",
+    "license": "AGPL-3.0",
+    "controller": [
+        {
+            "name": "AndroidNative",
+            "label": "Android 原生控制 (Shizuku / Root 后台虚拟副屏)",
+            "description": "推荐在手机上使用 1080P 后台虚拟副屏模式运行，不抢占主屏焦点且 100% 适配 16:9 模板",
+            "type": "AndroidNative",
+            "display_short_side": 1080,
+            "permission_required": true
+        },
+        {
+            "name": "Adb",
+            "label": "ADB 模拟器 / 无线调试模式",
+            "type": "Adb",
+            "display_short_side": 1080
+        },
+        {
+            "name": "Win32",
+            "label": "Windows 桌面窗口",
+            "type": "Win32",
+            "display_short_side": 1080,
+            "win32": {
+                "class_regex": "UnityWndClass",
+                "window_regex": "LimbusCompany"
+            }
+        }
+    ],
+    "resource": [
+        {
+            "name": "Default",
+            "label": "默认资源包 (中/英双语自适应 + 暗黑模式自适应)",
+            "path": [
+                "{PROJECT_DIR}/resource/base"
+            ]
+        }
+    ],
+    "agent": {
+        "child_exec": "python3",
+        "child_args": [
+            "-u",
+            "{PROJECT_DIR}/agent/main.py"
+        ]
+    },
+    "task": [
+        {
+            "name": "一键长草 (完整AALC流程)",
+            "entry": "AALC_FullScriptTask",
+            "default_check": true,
+            "description": "按顺序执行已勾选的日常采光、奖励领取、狂气买体与全自动镜牢（完整还原 AALC 主界面一键启动逻辑）",
+            "option": [
+                "EnableDailyTask",
+                "ExpCount",
+                "ThreadCount",
+                "DailyTeamNumber",
+                "SelectTeamByOrder",
+                "UseContinuousCombat",
+                "ContinuousCombatMax",
+                "EnableGetReward",
+                "GetPrizeMode",
+                "EnableBuyEnkephalin",
+                "LunacyToEnkephalinTimes",
+                "DrGrandetMode",
+                "SkipEnkephalin",
+                "EnableMirrorInFull",
+                "MirrorCount",
+                "HardMirror",
+                "AutoHardMirror",
+                "MirrorTeamSystem",
+                "MirrorTeamNumber",
+                "SinnerOrderInput",
+                "MirrorShopStrategy",
+                "AvoidSkill3",
+                "PrioritizeSkill3",
+                "Floor3Exit",
+                "InfiniteDungeons",
+                "SaveHardRewards"
+            ]
+        },
+        {
+            "name": "启动游戏并进入大厅",
+            "entry": "AALC_StartAndBackHome",
+            "default_check": false,
+            "description": "在副屏/主屏冷启动《边狱巴士》，安全通过标题页、清理活动弹窗并自动合成脑啡肽模块",
+            "option": [
+                "SkipEnkephalin"
+            ]
+        },
+        {
+            "name": "合成脑啡肽模块 & 狂气换体",
+            "entry": "AALC_EnkephalinTask",
+            "default_check": false,
+            "description": "将当前脑啡肽全部合成为模块，可选使用狂气购买体力（支持葛朗台卡点模式）",
+            "option": [
+                "EnableBuyEnkephalin",
+                "LunacyToEnkephalinTimes",
+                "DrGrandetMode"
+            ]
+        },
+        {
+            "name": "日常采光：经验本 (EXP Luxcavation)",
+            "entry": "AALC_ExpLuxcavationTask",
+            "default_check": false,
+            "description": "自动进入经验采光最新解锁关卡并完成战斗（支持连续作战与按星期指定编队）",
+            "option": [
+                "ExpCount",
+                "DailyTeamNumber",
+                "SelectTeamByOrder",
+                "UseContinuousCombat",
+                "ContinuousCombatMax",
+                "TargetedTeamingEXP"
+            ]
+        },
+        {
+            "name": "日常采光：纽本 (Thread Luxcavation)",
+            "entry": "AALC_ThreadLuxcavationTask",
+            "default_check": false,
+            "description": "自动进入纺锤纽本最新解锁关卡并完成战斗（支持连续作战与按星期指定编队）",
+            "option": [
+                "ThreadCount",
+                "DailyTeamNumber",
+                "SelectTeamByOrder",
+                "UseContinuousCombat",
+                "ContinuousCombatMax",
+                "TargetedTeamingThread"
+            ]
+        },
+        {
+            "name": "领取通行证日常/周常与邮箱奖励",
+            "entry": "AALC_ClaimRewardsTask",
+            "default_check": false,
+            "description": "自动收取赛季通行证日常/周常任务经验与邮箱附件",
+            "option": [
+                "GetPrizeMode"
+            ]
+        },
+        {
+            "name": "全自动镜牢 (Mirror Dungeon)",
+            "entry": "AALC_MirrorDungeonTask",
+            "default_check": false,
+            "description": "完整还原 AALC 全自动镜牢：支持 10 大体系、星芒增益、初始/观测饰品、卡包权重 OCR、YOLO 地图寻路、商店强化合成与自动战斗拉链",
+            "option": [
+                "MirrorCount",
+                "HardMirror",
+                "AutoHardMirror",
+                "InfiniteDungeons",
+                "Floor3Exit",
+                "SaveHardRewards",
+                "NoWeeklyBonuses",
+                "HardMirrorSingleBonuses",
+                "SelectEventPack",
+                "SkipEventPack",
+                "ReClaimRewards",
+                "NotSkipWhiteGossypium",
+                "FightToLastMan",
+                "SelectTeamByOrder",
+                "MirrorKeyboardNav",
+                "MirrorTeamSystem",
+                "MirrorTeamNumber",
+                "SinnerOrderInput",
+                "MirrorShopStrategy",
+                "AfterFuseLevelIV",
+                "ShoppingStrategyOption",
+                "RewardCardPriority",
+                "OpeningItemsOrder",
+                "UseStarlightToCost",
+                "AvoidSkill3",
+                "PrioritizeSkill3",
+                "DefenseFirstRound",
+                "DefenseForSolo",
+                "ReFormationEachFloor",
+                "NormalToHardFloor",
+                "SecondSystemOption",
+                "SkillReplacementOption",
+                "MaxKeywordRefresh",
+                "MaxNormalRefresh",
+                "UseTeamCodeOption"
+            ]
+        },
+        {
+            "name": "小工具：亚哈降神附身代打 (无限自动战斗)",
+            "entry": "AALC_InfiniteBattleTool",
+            "default_check": false,
+            "description": "主线/高难关卡手动进战后开启，自动接管每一回合连线、胜率、全员守备与战斗内判定事件",
+            "option": [
+                "ToolInfiniteDefense",
+                "ToolDefenseTurn1",
+                "ToolHandleEvents"
+            ]
+        },
+        {
+            "name": "小工具：T巢资本家定时换饼 (自动计算体力回复)",
+            "entry": "AALC_ProductionModuleTool",
+            "default_check": false,
+            "description": "OCR 识别当前脑啡肽体力与回复倒计时，满 20 体力自动上线合成模块，等待期间可选关闭游戏省电",
+            "option": [
+                "ToolKillGameWaiting",
+                "ToolProductionCycles"
+            ]
+        }
+    ],
+    "option": {
+        "EnableDailyTask": {
+            "type": "switch",
+            "label": "启用日常采光 (经验本/纽本)",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_task": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_task": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ExpCount": {
+            "type": "input",
+            "label": "经验本采光次数",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "经验本次数",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "set_EXP_count": "{count}"
+                    }
+                }
+            }
+        },
+        "ThreadCount": {
+            "type": "input",
+            "label": "纽本采光次数",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "纽本次数",
+                    "default": "3",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "set_thread_count": "{count}"
+                    }
+                }
+            }
+        },
+        "DailyTeamNumber": {
+            "type": "input",
+            "label": "日常采光使用的队伍序号 (1~40)",
+            "inputs": [
+                {
+                    "name": "team_num",
+                    "label": "队伍序号",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "daily_teams": "{team_num}"
+                    }
+                }
+            }
+        },
+        "SelectTeamByOrder": {
+            "type": "switch",
+            "label": "按列表顺序选择队伍 (不通过队伍名 OCR)",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "按位置顺序选队 (推荐)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "select_team_by_order": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "按 TEAMS #N 名称 OCR 选队",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "select_team_by_order": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "UseContinuousCombat": {
+            "type": "switch",
+            "label": "日常采光使用游戏内连续战斗功能",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_continuous_combat": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_continuous_combat": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ContinuousCombatMax": {
+            "type": "input",
+            "label": "单场连续战斗最大次数 (1~10)",
+            "inputs": [
+                {
+                    "name": "max_c",
+                    "label": "单场连战次数",
+                    "default": "3",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "use_continuous_combat_select": "{max_c}"
+                    }
+                }
+            }
+        },
+        "TargetedTeamingEXP": {
+            "type": "switch",
+            "label": "经验本按星期切换对应属性队伍",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "targeted_teaming_EXP": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "targeted_teaming_EXP": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "TargetedTeamingThread": {
+            "type": "switch",
+            "label": "纽本按星期一至周日切换指定队伍",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "targeted_teaming_thread": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "targeted_teaming_thread": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "EnableGetReward": {
+            "type": "switch",
+            "label": "启用自动领取日常/周常与邮箱奖励",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "get_reward": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "get_reward": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "GetPrizeMode": {
+            "type": "select",
+            "label": "奖励领取范围",
+            "default_case": "Both",
+            "cases": [
+                {
+                    "name": "Both",
+                    "label": "邮件 + 通行证日/周常",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_get_prize": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "PassOnly",
+                    "label": "仅通行证日/周常",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_get_prize": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "MailOnly",
+                    "label": "仅邮箱奖励",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_get_prize": 2
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "EnableBuyEnkephalin": {
+            "type": "switch",
+            "label": "启用狂气购买脑啡肽体力",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "buy_enkephalin": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "buy_enkephalin": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "LunacyToEnkephalinTimes": {
+            "type": "select",
+            "label": "每日狂气买体次数",
+            "default_case": "Once",
+            "cases": [
+                {
+                    "name": "Zero",
+                    "label": "不换 (0次)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_lunacy_to_enkephalin": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Once",
+                    "label": "换 1 次 (26狂气)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_lunacy_to_enkephalin": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Twice",
+                    "label": "换 2 次 (26+52狂气)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_lunacy_to_enkephalin": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Thrice",
+                    "label": "换 3 次 (26+52+78狂气)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_lunacy_to_enkephalin": 3
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "DrGrandetMode": {
+            "type": "switch",
+            "label": "葛朗台模式 (等待下一格体力刚恢复后再买体)",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "Dr_Grandet_mode": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "Dr_Grandet_mode": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SkipEnkephalin": {
+            "type": "switch",
+            "label": "跳过自动合成脑啡肽模块",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "跳过合成",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skip_enkephalin": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "正常自动合成",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skip_enkephalin": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "EnableMirrorInFull": {
+            "type": "switch",
+            "label": "在一键长草中执行全自动镜牢",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "mirror": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "mirror": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "MirrorCount": {
+            "type": "input",
+            "label": "镜牢执行次数",
+            "inputs": [
+                {
+                    "name": "m_count",
+                    "label": "刷牢次数",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "set_mirror_count": "{m_count}"
+                    }
+                }
+            }
+        },
+        "HardMirror": {
+            "type": "switch",
+            "label": "进行困难镜牢 (Hard Mode)",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "困难镜牢",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "hard_mirror": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "普通镜牢",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "hard_mirror": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "AutoHardMirror": {
+            "type": "switch",
+            "label": "每周四自动切换完成困难镜牢周常",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "auto_hard_mirror": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "auto_hard_mirror": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "InfiniteDungeons": {
+            "type": "switch",
+            "label": "无限刷牢模式 (9999次)",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "infinite_dungeons": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "infinite_dungeons": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "Floor3Exit": {
+            "type": "switch",
+            "label": "打完第 3 层后直接结算退出",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "floor_3_exit": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "打满全程",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "floor_3_exit": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SaveHardRewards": {
+            "type": "switch",
+            "label": "困难镜牢打完保存奖励暂不领取",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "保存奖励不结算",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "save_rewards": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "正常领取结算",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "save_rewards": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "NoWeeklyBonuses": {
+            "type": "switch",
+            "label": "结算时不使用每周额外加成",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "不使用每周加成",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "no_weekly_bonuses": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "正常使用加成",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "no_weekly_bonuses": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "HardMirrorSingleBonuses": {
+            "type": "switch",
+            "label": "困难镜牢结算分单次消耗每周加成",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "单次消耗",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "hard_mirror_single_bonuses": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "一次全消耗",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "hard_mirror_single_bonuses": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SelectEventPack": {
+            "type": "switch",
+            "label": "第 5 层优先选择最左侧活动卡包",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "select_event_pack": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "select_event_pack": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SkipEventPack": {
+            "type": "switch",
+            "label": "第 5 层强制跳过最左侧活动卡包",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skip_event_pack": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skip_event_pack": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ReClaimRewards": {
+            "type": "switch",
+            "label": "完成镜牢后再次执行日常/周常领奖",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "re_claim_rewards": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "re_claim_rewards": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "NotSkipWhiteGossypium": {
+            "type": "switch",
+            "label": "流血队不跳过『白棉花』(White Gossypium)",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "不跳过白棉花",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "not_skip_whitegossypium": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "流血队自动跳过白棉花",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "not_skip_whitegossypium": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "FightToLastMan": {
+            "type": "switch",
+            "label": "战斗直到全灭 (存活不足5人也不重开)",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "战斗到底",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "fight_to_last_man": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "存活不足5人自动重开",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "fight_to_last_man": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "MirrorKeyboardNav": {
+            "type": "select",
+            "label": "镜牢地图寻路操控模式",
+            "default_case": "TouchYOLO",
+            "cases": [
+                {
+                    "name": "TouchYOLO",
+                    "label": "YOLO 路线规划 + 触控拖拽点击 (默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "mirror_keyboard_navigation": false,
+                                "mirror_keyboard_simple_pathfinding": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "KeyboardNav",
+                    "label": "YOLO 路线规划 + 方向键寻路",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "mirror_keyboard_navigation": true,
+                                "mirror_keyboard_simple_pathfinding": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "SimpleUp",
+                    "label": "极简方向键寻路 (始终按↑选首节点)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "mirror_keyboard_navigation": true,
+                                "mirror_keyboard_simple_pathfinding": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "MirrorTeamSystem": {
+            "type": "select",
+            "label": "镜牢队伍主体系 (决定初始饰品/商店购买/合成)",
+            "default_case": "Burn",
+            "cases": [
+                {
+                    "name": "Burn",
+                    "label": "0 - 烧伤 (Burn)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Bleed",
+                    "label": "1 - 流血 (Bleed)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Tremor",
+                    "label": "2 - 震颤 (Tremor)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Rupture",
+                    "label": "3 - 破裂 (Rupture)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Poise",
+                    "label": "4 - 呼吸 (Poise)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Sinking",
+                    "label": "5 - 沉沦 (Sinking)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Charge",
+                    "label": "6 - 充能 (Charge)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Slash",
+                    "label": "7 - 斩击 (Slash)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Pierce",
+                    "label": "8 - 突刺 (Pierce)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Blunt",
+                    "label": "9 - 打击 (Blunt)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_system": 9
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "MirrorTeamNumber": {
+            "type": "input",
+            "label": "镜牢使用的游戏内队伍序号 (1~40)",
+            "inputs": [
+                {
+                    "name": "m_team_num",
+                    "label": "队伍序号",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "team_number": "{m_team_num}"
+                    }
+                }
+            }
+        },
+        "SinnerOrderInput": {
+            "type": "input",
+            "label": "罪人出战顺位 (按顺序列出罪人编号 1~12，逗号分隔)",
+            "description": "1:李箱 2:浮士德 3:堂吉诃德 4:良秀 5:默尔索 6:鸿璐 7:希斯克利夫 8:以实玛利 9:罗佳 10:辛克莱 11:奥提斯 12:格里高尔",
+            "inputs": [
+                {
+                    "name": "order_str",
+                    "label": "出战顺位",
+                    "default": "1,2,3,4,5,6,7,8,9,10,11,12",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "sinner_order_str": "{order_str}"
+                    }
+                }
+            }
+        },
+        "MirrorShopStrategy": {
+            "type": "select",
+            "label": "镜牢商店策略",
+            "default_case": "FuseNormal",
+            "cases": [
+                {
+                    "name": "Sell",
+                    "label": "0 - 出售非体系饰品",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "shop_strategy": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "FuseNormal",
+                    "label": "1 - 普通合成模式",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "shop_strategy": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "FuseLevelIV",
+                    "label": "2 - 激进合成：四级饰品优先",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "shop_strategy": 2
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "AfterFuseLevelIV": {
+            "type": "select",
+            "label": "合成出四级饰品后的后续商店策略",
+            "default_case": "KeepDefault",
+            "cases": [
+                {
+                    "name": "KeepDefault",
+                    "label": "保持原策略",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "after_level_IV": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "ToSell",
+                    "label": "改为出售策略",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "after_level_IV": true,
+                                "after_level_IV_select": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "ToNormalFuse",
+                    "label": "改为普通合成策略",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "after_level_IV": true,
+                                "after_level_IV_select": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "FuseSecondIV",
+                    "label": "合成第二体系四级饰品",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "after_level_IV": true,
+                                "after_level_IV_select": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "SkipShop",
+                    "label": "直接跳过后续商店",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "after_level_IV": true,
+                                "after_level_IV_select": 3
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ShoppingStrategyOption": {
+            "type": "select",
+            "label": "自定义商店购物偏好",
+            "default_case": "DefaultBuy",
+            "cases": [
+                {
+                    "name": "DefaultBuy",
+                    "label": "默认全买 (回血+素材+本体系)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "shopping_strategy": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "OnlyHeal",
+                    "label": "仅购买回血饰品",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "shopping_strategy": true,
+                                "shopping_strategy_select": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "OnlyTier34",
+                    "label": "四级优先时：仅买3-4级饰品",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "shopping_strategy": true,
+                                "shopping_strategy_select": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "OnlySystem",
+                    "label": "仅购买本体系饰品",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "shopping_strategy": true,
+                                "shopping_strategy_select": 2
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "RewardCardPriority": {
+            "type": "select",
+            "label": "遭遇战奖励卡优先级",
+            "default_case": "StarFirst",
+            "cases": [
+                {
+                    "name": "StarFirst",
+                    "label": "星光 → 饰品 → 钱 → 饰品/钱 → 罪孽",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "reward_cards": true,
+                                "reward_cards_select": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "StarCost",
+                    "label": "星光 → 钱 → 饰品 → 饰品/钱 → 罪孽",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "reward_cards": true,
+                                "reward_cards_select": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "CostFirst",
+                    "label": "钱 → 饰品 → 饰品/钱 → 罪孽 → 星光",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "reward_cards": true,
+                                "reward_cards_select": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "EgoFirst",
+                    "label": "饰品 → 钱 → 饰品/钱 → 罪孽 → 星光",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "reward_cards": true,
+                                "reward_cards_select": 3
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "OpeningItemsOrder": {
+            "type": "select",
+            "label": "开局初始饰品点选顺序",
+            "default_case": "Order123",
+            "cases": [
+                {
+                    "name": "Order123",
+                    "label": "1 → 2 → 3 (默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "opening_items": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Order321",
+                    "label": "3 → 2 → 1",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "opening_items": true,
+                                "opening_items_select": 5
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "UseStarlightToCost": {
+            "type": "switch",
+            "label": "开局星芒界面启用星光换经费",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_starlight": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_starlight": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "AvoidSkill3": {
+            "type": "switch",
+            "label": "战斗拉链时避免使用 3 技能",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "avoid_skill_3": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "avoid_skill_3": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "PrioritizeSkill3": {
+            "type": "switch",
+            "label": "战斗拉链时优先使用 3 技能",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "prioritize_skill_3": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "prioritize_skill_3": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "DefenseFirstRound": {
+            "type": "switch",
+            "label": "每场战斗第一回合全员守备",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "defense_first_round": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "defense_first_round": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "DefenseForSolo": {
+            "type": "switch",
+            "label": "小指良单通模式 (前N回合连续守备献祭队友)",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "defense_for_solo": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "defense_for_solo": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ReFormationEachFloor": {
+            "type": "switch",
+            "label": "每个楼层首战重新编队",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "re_formation_each_floor": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "re_formation_each_floor": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "NormalToHardFloor": {
+            "type": "select",
+            "label": "中途切入困难模式的楼层",
+            "default_case": "Never",
+            "cases": [
+                {
+                    "name": "Never",
+                    "label": "不中途切换 (0)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "normal_to_hard_floor": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Floor3",
+                    "label": "第 3 层切困难",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "normal_to_hard_floor": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Floor4",
+                    "label": "第 4 层切困难",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "normal_to_hard_floor": 4
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SecondSystemOption": {
+            "type": "select",
+            "label": "启用第二体系辅助合成",
+            "default_case": "Disabled",
+            "cases": [
+                {
+                    "name": "Disabled",
+                    "label": "不启用第二体系",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "second_system": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "PoiseSecond",
+                    "label": "第二体系：呼吸 (Poise)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "second_system": true,
+                                "second_system_select": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "ChargeSecond",
+                    "label": "第二体系：充能 (Charge)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "second_system": true,
+                                "second_system_select": 6
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "SkillReplacementOption": {
+            "type": "select",
+            "label": "商店技能替换策略",
+            "default_case": "NoReplace",
+            "cases": [
+                {
+                    "name": "NoReplace",
+                    "label": "不替换技能",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skill_replacement": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "FirstSinner1To3",
+                    "label": "配队首位：1技能 → 3技能",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skill_replacement": true,
+                                "skill_replacement_select": 0,
+                                "skill_replacement_mode": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "AllSelected1To3",
+                    "label": "所有出战罪人：1技能 → 3技能",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "skill_replacement": true,
+                                "skill_replacement_select": 3,
+                                "skill_replacement_mode": 0
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "MaxKeywordRefresh": {
+            "type": "input",
+            "label": "商店每次定向刷新次数上限 (0~5)",
+            "inputs": [
+                {
+                    "name": "kr",
+                    "label": "定向刷新次数",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "max_keyword_refresh": "{kr}"
+                    }
+                }
+            }
+        },
+        "MaxNormalRefresh": {
+            "type": "input",
+            "label": "商店每次普通刷新次数上限 (0~5)",
+            "inputs": [
+                {
+                    "name": "nr",
+                    "label": "普通刷新次数",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "max_normal_refresh": "{nr}"
+                    }
+                }
+            }
+        },
+        "UseTeamCodeOption": {
+            "type": "input",
+            "label": "镜牢加载游戏内编队码 (留空则不使用)",
+            "inputs": [
+                {
+                    "name": "tcode",
+                    "label": "编队码字符串",
+                    "default": "",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "use_team_code": true,
+                        "team_code": "{tcode}"
+                    }
+                }
+            }
+        },
+        "ToolInfiniteDefense": {
+            "type": "switch",
+            "label": "代打小工具：全程无限守备",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "tool_infinite_defense": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "tool_infinite_defense": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ToolDefenseTurn1": {
+            "type": "switch",
+            "label": "代打小工具：仅第 1 回合开启守备",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "tool_defense_turn1": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "tool_defense_turn1": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ToolHandleEvents": {
+            "type": "switch",
+            "label": "代打小工具：自动处理战斗中异想体判定事件",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "自动处理",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "tool_handle_events": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "不处理",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "tool_handle_events": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ToolKillGameWaiting": {
+            "type": "switch",
+            "label": "定时换饼：等待体力恢复期间关闭游戏省电",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "关闭游戏等待",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "tool_kill_game_waiting": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "保持游戏挂机",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "tool_kill_game_waiting": false
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ToolProductionCycles": {
+            "type": "input",
+            "label": "定时换饼循环轮数 (0 为无限循环)",
+            "inputs": [
+                {
+                    "name": "p_cycles",
+                    "label": "循环轮数",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AALC_ConfigHolder": {
+                    "attach": {
+                        "tool_production_cycles": "{p_cycles}"
+                    }
+                }
+            }
+        }
+    }
+}

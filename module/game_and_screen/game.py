@@ -2,7 +2,10 @@ import os
 import webbrowser
 from time import sleep, time
 
-import psutil
+try:
+    import psutil
+except ImportError:
+    psutil = None
 
 from module.config import cfg
 from utils.singletonmeta import SingletonMeta
@@ -19,6 +22,8 @@ class Game(metaclass=SingletonMeta):
         self.check_in_short_time = 0
 
     def check_game_alive(self):
+        if psutil is None:
+            return False
         for proc in psutil.process_iter(["name"]):
             try:
                 # 获取进程的可执行文件名（如 "notepad.exe"）
