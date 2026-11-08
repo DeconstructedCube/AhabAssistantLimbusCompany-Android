@@ -1,23 +1,23 @@
 {
     "interface_version": 2,
-    "name": "AALC_Android",
-    "label": "AALC 边狱巴士助手",
+    "name": "AALC",
+    "label": "AALC 边狱助手",
     "version": "v2.5.0-android",
-    "welcome": "欢迎使用 AALC (AhabAssistantLimbusCompany) 安卓原生版！支持 1920x1080 后台虚拟副屏免打扰挂机，100% 完整还原 AALC 桌面版全部日常采光、体力合成、奖励领取与全自动镜牢逻辑。",
-    "contact": "https://github.com/KIYI671/AhabAssistantLimbusCompany",
+    "welcome": "### 快速使用指引\n\n1. **授权运行**：首次使用请先启动 **Shizuku** 并允许授权（或使用 Root）。\n2. **选择任务**：在主界面勾选需要的任务（如「一键长草」），点击展开可修改次数和编队。\n3. **开始运行**：点击右下角「开始」。默认使用 **1080P 后台副屏** 运行，不会影响手机前台使用，可点悬浮窗小窗查看实时画面。\n",
+    "contact": "CONTACT",
     "license": "AGPL-3.0",
     "controller": [
         {
             "name": "AndroidNative",
-            "label": "Android 原生控制 (Shizuku / Root 后台虚拟副屏)",
-            "description": "推荐在手机上使用 1080P 后台虚拟副屏模式运行，不抢占主屏焦点且 100% 适配 16:9 模板",
+            "label": "Android 后台副屏 (推荐·免打扰)",
+            "description": "使用 1080P 独立虚拟副屏运行，不影响前台使用手机。",
             "type": "AndroidNative",
             "display_short_side": 1080,
             "permission_required": true
         },
         {
             "name": "Adb",
-            "label": "ADB 模拟器 / 无线调试模式",
+            "label": "ADB 调试 / 模拟器",
             "type": "Adb",
             "display_short_side": 1080
         },
@@ -35,7 +35,7 @@
     "resource": [
         {
             "name": "Default",
-            "label": "默认资源包 (中/英双语自适应 + 暗黑模式自适应)",
+            "label": "默认资源",
             "path": [
                 "{PROJECT_DIR}/resource/base"
             ]
@@ -50,10 +50,10 @@
     },
     "task": [
         {
-            "name": "一键长草 (完整AALC流程)",
+            "name": "一键长草",
             "entry": "AALC_FullScriptTask",
             "default_check": true,
-            "description": "按顺序执行已勾选的日常采光、奖励领取、狂气买体与全自动镜牢（完整还原 AALC 主界面一键启动逻辑）",
+            "description": "依次执行采光、换体、领奖与镜牢。",
             "option": [
                 "EnableDailyTask",
                 "ExpCount",
@@ -88,19 +88,19 @@
             ]
         },
         {
-            "name": "启动游戏并进入大厅",
+            "name": "启动游戏至大厅",
             "entry": "AALC_StartAndBackHome",
             "default_check": false,
-            "description": "在副屏/主屏冷启动《边狱巴士》，安全通过标题页、清理活动弹窗并自动合成脑啡肽模块",
+            "description": "启动游戏、点击标题进入并关闭活动弹窗。",
             "option": [
                 "SkipEnkephalin"
             ]
         },
         {
-            "name": "合成脑啡肽模块 & 狂气换体",
+            "name": "脑啡肽换体",
             "entry": "AALC_EnkephalinTask",
             "default_check": false,
-            "description": "将当前脑啡肽全部合成为模块，可选使用狂气购买体力（支持葛朗台卡点模式）",
+            "description": "合成脑啡肽模块或使用狂气购买体力。",
             "option": [
                 "EnableBuyEnkephalin",
                 "LunacyToEnkephalinTimes",
@@ -108,10 +108,10 @@
             ]
         },
         {
-            "name": "日常采光：经验本 (EXP Luxcavation)",
+            "name": "经验采光",
             "entry": "AALC_ExpLuxcavationTask",
             "default_check": false,
-            "description": "自动进入经验采光最新解锁关卡并完成战斗（支持连续作战与按星期指定编队）",
+            "description": "自动进入并完成经验本。",
             "option": [
                 "ExpCount",
                 "DailyTeamNumber",
@@ -122,10 +122,10 @@
             ]
         },
         {
-            "name": "日常采光：纽本 (Thread Luxcavation)",
+            "name": "纽本采光",
             "entry": "AALC_ThreadLuxcavationTask",
             "default_check": false,
-            "description": "自动进入纺锤纽本最新解锁关卡并完成战斗（支持连续作战与按星期指定编队）",
+            "description": "自动进入并完成纽本。",
             "option": [
                 "ThreadCount",
                 "DailyTeamNumber",
@@ -136,19 +136,19 @@
             ]
         },
         {
-            "name": "领取通行证日常/周常与邮箱奖励",
+            "name": "领取奖励",
             "entry": "AALC_ClaimRewardsTask",
             "default_check": false,
-            "description": "自动收取赛季通行证日常/周常任务经验与邮箱附件",
+            "description": "领取通行证任务经验与邮箱附件。",
             "option": [
                 "GetPrizeMode"
             ]
         },
         {
-            "name": "全自动镜牢 (Mirror Dungeon)",
+            "name": "自动镜牢",
             "entry": "AALC_MirrorDungeonTask",
             "default_check": false,
-            "description": "完整还原 AALC 全自动镜牢：支持 10 大体系、星芒增益、初始/观测饰品、卡包权重 OCR、YOLO 地图寻路、商店强化合成与自动战斗拉链",
+            "description": "全流程自动运行镜牢。",
             "option": [
                 "MirrorCount",
                 "HardMirror",
@@ -192,10 +192,10 @@
             ]
         },
         {
-            "name": "小工具：亚哈降神附身代打 (无限自动战斗)",
+            "name": "自动战斗代打",
             "entry": "AALC_InfiniteBattleTool",
             "default_check": false,
-            "description": "主线/高难关卡手动进战后开启，自动接管每一回合连线、胜率、全员守备与战斗内判定事件",
+            "description": "战斗中自动拼刀与选技能。",
             "option": [
                 "ToolInfiniteDefense",
                 "ToolDefenseTurn1",
@@ -203,10 +203,10 @@
             ]
         },
         {
-            "name": "小工具：T巢资本家定时换饼 (自动计算体力回复)",
+            "name": "定时换饼",
             "entry": "AALC_ProductionModuleTool",
             "default_check": false,
-            "description": "OCR 识别当前脑啡肽体力与回复倒计时，满 20 体力自动上线合成模块，等待期间可选关闭游戏省电",
+            "description": "监控体力倒计时并自动合成模块。",
             "option": [
                 "ToolKillGameWaiting",
                 "ToolProductionCycles"
@@ -216,7 +216,7 @@
     "option": {
         "EnableDailyTask": {
             "type": "switch",
-            "label": "启用日常采光 (经验本/纽本)",
+            "label": "日常采光",
             "default_case": "Yes",
             "cases": [
                 {
@@ -245,7 +245,7 @@
         },
         "ExpCount": {
             "type": "input",
-            "label": "经验本采光次数",
+            "label": "经验本次数",
             "inputs": [
                 {
                     "name": "count",
@@ -264,7 +264,7 @@
         },
         "ThreadCount": {
             "type": "input",
-            "label": "纽本采光次数",
+            "label": "纽本次数",
             "inputs": [
                 {
                     "name": "count",
@@ -283,7 +283,7 @@
         },
         "DailyTeamNumber": {
             "type": "input",
-            "label": "日常采光使用的队伍序号 (1~40)",
+            "label": "日常编队序号",
             "inputs": [
                 {
                     "name": "team_num",
@@ -302,7 +302,7 @@
         },
         "SelectTeamByOrder": {
             "type": "switch",
-            "label": "按列表顺序选择队伍 (不通过队伍名 OCR)",
+            "label": "按列表顺序选队",
             "default_case": "Yes",
             "cases": [
                 {
@@ -331,7 +331,7 @@
         },
         "UseContinuousCombat": {
             "type": "switch",
-            "label": "日常采光使用游戏内连续战斗功能",
+            "label": "连续战斗",
             "default_case": "No",
             "cases": [
                 {
@@ -360,7 +360,7 @@
         },
         "ContinuousCombatMax": {
             "type": "input",
-            "label": "单场连续战斗最大次数 (1~10)",
+            "label": "连战次数上限",
             "inputs": [
                 {
                     "name": "max_c",
@@ -379,7 +379,7 @@
         },
         "TargetedTeamingEXP": {
             "type": "switch",
-            "label": "经验本按星期切换对应属性队伍",
+            "label": "经验本按星期选队",
             "default_case": "No",
             "cases": [
                 {
@@ -408,7 +408,7 @@
         },
         "TargetedTeamingThread": {
             "type": "switch",
-            "label": "纽本按星期一至周日切换指定队伍",
+            "label": "纽本按星期选队",
             "default_case": "No",
             "cases": [
                 {
@@ -437,7 +437,7 @@
         },
         "EnableGetReward": {
             "type": "switch",
-            "label": "启用自动领取日常/周常与邮箱奖励",
+            "label": "领取奖励",
             "default_case": "Yes",
             "cases": [
                 {
@@ -466,7 +466,7 @@
         },
         "GetPrizeMode": {
             "type": "select",
-            "label": "奖励领取范围",
+            "label": "领奖范围",
             "default_case": "Both",
             "cases": [
                 {
@@ -506,7 +506,7 @@
         },
         "EnableBuyEnkephalin": {
             "type": "switch",
-            "label": "启用狂气购买脑啡肽体力",
+            "label": "狂气买体",
             "default_case": "No",
             "cases": [
                 {
@@ -535,7 +535,7 @@
         },
         "LunacyToEnkephalinTimes": {
             "type": "select",
-            "label": "每日狂气买体次数",
+            "label": "买体次数",
             "default_case": "Once",
             "cases": [
                 {
@@ -586,7 +586,7 @@
         },
         "DrGrandetMode": {
             "type": "switch",
-            "label": "葛朗台模式 (等待下一格体力刚恢复后再买体)",
+            "label": "卡点买体 (等下点体力回复后再买)",
             "default_case": "No",
             "cases": [
                 {
@@ -615,7 +615,7 @@
         },
         "SkipEnkephalin": {
             "type": "switch",
-            "label": "跳过自动合成脑啡肽模块",
+            "label": "跳过模块合成",
             "default_case": "No",
             "cases": [
                 {
@@ -644,7 +644,7 @@
         },
         "EnableMirrorInFull": {
             "type": "switch",
-            "label": "在一键长草中执行全自动镜牢",
+            "label": "在一键长草中运行镜牢",
             "default_case": "No",
             "cases": [
                 {
@@ -673,7 +673,7 @@
         },
         "MirrorCount": {
             "type": "input",
-            "label": "镜牢执行次数",
+            "label": "镜牢次数",
             "inputs": [
                 {
                     "name": "m_count",
@@ -692,7 +692,7 @@
         },
         "HardMirror": {
             "type": "switch",
-            "label": "进行困难镜牢 (Hard Mode)",
+            "label": "困难模式",
             "default_case": "No",
             "cases": [
                 {
@@ -721,7 +721,7 @@
         },
         "AutoHardMirror": {
             "type": "switch",
-            "label": "每周四自动切换完成困难镜牢周常",
+            "label": "周四自动打困难周常",
             "default_case": "No",
             "cases": [
                 {
@@ -750,7 +750,7 @@
         },
         "InfiniteDungeons": {
             "type": "switch",
-            "label": "无限刷牢模式 (9999次)",
+            "label": "无限刷牢 (9999次)",
             "default_case": "No",
             "cases": [
                 {
@@ -779,7 +779,7 @@
         },
         "Floor3Exit": {
             "type": "switch",
-            "label": "打完第 3 层后直接结算退出",
+            "label": "打完前3层退出结算",
             "default_case": "No",
             "cases": [
                 {
@@ -808,7 +808,7 @@
         },
         "SaveHardRewards": {
             "type": "switch",
-            "label": "困难镜牢打完保存奖励暂不领取",
+            "label": "困难奖励保留不领",
             "default_case": "No",
             "cases": [
                 {
@@ -837,7 +837,7 @@
         },
         "NoWeeklyBonuses": {
             "type": "switch",
-            "label": "结算时不使用每周额外加成",
+            "label": "不消耗每周加成",
             "default_case": "No",
             "cases": [
                 {
@@ -866,7 +866,7 @@
         },
         "HardMirrorSingleBonuses": {
             "type": "switch",
-            "label": "困难镜牢结算分单次消耗每周加成",
+            "label": "单次消耗每周加成",
             "default_case": "No",
             "cases": [
                 {
@@ -895,7 +895,7 @@
         },
         "SelectEventPack": {
             "type": "switch",
-            "label": "第 5 层优先选择最左侧活动卡包",
+            "label": "第5层优先选活动卡包",
             "default_case": "No",
             "cases": [
                 {
@@ -924,7 +924,7 @@
         },
         "SkipEventPack": {
             "type": "switch",
-            "label": "第 5 层强制跳过最左侧活动卡包",
+            "label": "第5层跳过活动卡包",
             "default_case": "No",
             "cases": [
                 {
@@ -953,7 +953,7 @@
         },
         "ReClaimRewards": {
             "type": "switch",
-            "label": "完成镜牢后再次执行日常/周常领奖",
+            "label": "镜牢结束后重新领奖",
             "default_case": "No",
             "cases": [
                 {
@@ -982,7 +982,7 @@
         },
         "NotSkipWhiteGossypium": {
             "type": "switch",
-            "label": "流血队不跳过『白棉花』(White Gossypium)",
+            "label": "不跳过白棉花",
             "default_case": "No",
             "cases": [
                 {
@@ -1011,7 +1011,7 @@
         },
         "FightToLastMan": {
             "type": "switch",
-            "label": "战斗直到全灭 (存活不足5人也不重开)",
+            "label": "不提前重开 (战斗至全灭)",
             "default_case": "No",
             "cases": [
                 {
@@ -1040,7 +1040,7 @@
         },
         "MirrorKeyboardNav": {
             "type": "select",
-            "label": "镜牢地图寻路操控模式",
+            "label": "寻路操作模式",
             "default_case": "TouchYOLO",
             "cases": [
                 {
@@ -1083,7 +1083,7 @@
         },
         "MirrorTeamSystem": {
             "type": "select",
-            "label": "镜牢队伍主体系 (决定初始饰品/商店购买/合成)",
+            "label": "队伍主体系",
             "default_case": "Burn",
             "cases": [
                 {
@@ -1200,7 +1200,7 @@
         },
         "MirrorTeamNumber": {
             "type": "input",
-            "label": "镜牢使用的游戏内队伍序号 (1~40)",
+            "label": "镜牢编队序号",
             "inputs": [
                 {
                     "name": "m_team_num",
@@ -1219,8 +1219,8 @@
         },
         "SinnerOrderInput": {
             "type": "input",
-            "label": "罪人出战顺位 (按顺序列出罪人编号 1~12，逗号分隔)",
-            "description": "1:李箱 2:浮士德 3:堂吉诃德 4:良秀 5:默尔索 6:鸿璐 7:希斯克利夫 8:以实玛利 9:罗佳 10:辛克莱 11:奥提斯 12:格里高尔",
+            "label": "罪人出战顺位",
+            "description": "输入罪人编号 1~12，逗号分隔。如: 1,4,2,10,5,3,6,7,8,9,11,12",
             "inputs": [
                 {
                     "name": "order_str",
@@ -1239,7 +1239,7 @@
         },
         "MirrorShopStrategy": {
             "type": "select",
-            "label": "镜牢商店策略",
+            "label": "商店策略",
             "default_case": "FuseNormal",
             "cases": [
                 {
@@ -1279,7 +1279,7 @@
         },
         "AfterFuseLevelIV": {
             "type": "select",
-            "label": "合成出四级饰品后的后续商店策略",
+            "label": "出四级饰品后后续策略",
             "default_case": "KeepDefault",
             "cases": [
                 {
@@ -1345,7 +1345,7 @@
         },
         "ShoppingStrategyOption": {
             "type": "select",
-            "label": "自定义商店购物偏好",
+            "label": "商店购买偏好",
             "default_case": "DefaultBuy",
             "cases": [
                 {
@@ -1399,7 +1399,7 @@
         },
         "RewardCardPriority": {
             "type": "select",
-            "label": "遭遇战奖励卡优先级",
+            "label": "奖励卡优先级",
             "default_case": "StarFirst",
             "cases": [
                 {
@@ -1454,7 +1454,7 @@
         },
         "OpeningItemsOrder": {
             "type": "select",
-            "label": "开局初始饰品点选顺序",
+            "label": "初始饰品顺序",
             "default_case": "Order123",
             "cases": [
                 {
@@ -1484,7 +1484,7 @@
         },
         "UseStarlightToCost": {
             "type": "switch",
-            "label": "开局星芒界面启用星光换经费",
+            "label": "开局星光换经费",
             "default_case": "No",
             "cases": [
                 {
@@ -1513,7 +1513,7 @@
         },
         "AvoidSkill3": {
             "type": "switch",
-            "label": "战斗拉链时避免使用 3 技能",
+            "label": "避开 3 技能",
             "default_case": "No",
             "cases": [
                 {
@@ -1542,7 +1542,7 @@
         },
         "PrioritizeSkill3": {
             "type": "switch",
-            "label": "战斗拉链时优先使用 3 技能",
+            "label": "优先 3 技能",
             "default_case": "No",
             "cases": [
                 {
@@ -1571,7 +1571,7 @@
         },
         "DefenseFirstRound": {
             "type": "switch",
-            "label": "每场战斗第一回合全员守备",
+            "label": "第 1 回合全员守备",
             "default_case": "No",
             "cases": [
                 {
@@ -1600,7 +1600,7 @@
         },
         "DefenseForSolo": {
             "type": "switch",
-            "label": "小指良单通模式 (前N回合连续守备献祭队友)",
+            "label": "小指良单通献祭队友",
             "default_case": "No",
             "cases": [
                 {
@@ -1629,7 +1629,7 @@
         },
         "ReFormationEachFloor": {
             "type": "switch",
-            "label": "每个楼层首战重新编队",
+            "label": "每层首战重新排顺序",
             "default_case": "No",
             "cases": [
                 {
@@ -1658,7 +1658,7 @@
         },
         "NormalToHardFloor": {
             "type": "select",
-            "label": "中途切入困难模式的楼层",
+            "label": "中途切困难楼层",
             "default_case": "Never",
             "cases": [
                 {
@@ -1698,7 +1698,7 @@
         },
         "SecondSystemOption": {
             "type": "select",
-            "label": "启用第二体系辅助合成",
+            "label": "第二体系辅助",
             "default_case": "Disabled",
             "cases": [
                 {
@@ -1740,7 +1740,7 @@
         },
         "SkillReplacementOption": {
             "type": "select",
-            "label": "商店技能替换策略",
+            "label": "技能替换策略",
             "default_case": "NoReplace",
             "cases": [
                 {
@@ -1784,7 +1784,7 @@
         },
         "MaxKeywordRefresh": {
             "type": "input",
-            "label": "商店每次定向刷新次数上限 (0~5)",
+            "label": "定向刷新上限",
             "inputs": [
                 {
                     "name": "kr",
@@ -1803,7 +1803,7 @@
         },
         "MaxNormalRefresh": {
             "type": "input",
-            "label": "商店每次普通刷新次数上限 (0~5)",
+            "label": "普通刷新上限",
             "inputs": [
                 {
                     "name": "nr",
@@ -1822,7 +1822,7 @@
         },
         "UseTeamCodeOption": {
             "type": "input",
-            "label": "镜牢加载游戏内编队码 (留空则不使用)",
+            "label": "使用编队码",
             "inputs": [
                 {
                     "name": "tcode",
@@ -1842,7 +1842,7 @@
         },
         "ToolInfiniteDefense": {
             "type": "switch",
-            "label": "代打小工具：全程无限守备",
+            "label": "全程守备",
             "default_case": "No",
             "cases": [
                 {
@@ -1871,7 +1871,7 @@
         },
         "ToolDefenseTurn1": {
             "type": "switch",
-            "label": "代打小工具：仅第 1 回合开启守备",
+            "label": "仅第 1 回合守备",
             "default_case": "No",
             "cases": [
                 {
@@ -1900,7 +1900,7 @@
         },
         "ToolHandleEvents": {
             "type": "switch",
-            "label": "代打小工具：自动处理战斗中异想体判定事件",
+            "label": "自动处理判定事件",
             "default_case": "Yes",
             "cases": [
                 {
@@ -1929,7 +1929,7 @@
         },
         "ToolKillGameWaiting": {
             "type": "switch",
-            "label": "定时换饼：等待体力恢复期间关闭游戏省电",
+            "label": "等待期间关闭游戏",
             "default_case": "No",
             "cases": [
                 {
@@ -1958,7 +1958,7 @@
         },
         "ToolProductionCycles": {
             "type": "input",
-            "label": "定时换饼循环轮数 (0 为无限循环)",
+            "label": "循环轮数",
             "inputs": [
                 {
                     "name": "p_cycles",
@@ -1977,7 +1977,7 @@
         },
         "OpeningBonusPreset": {
             "type": "select",
-            "label": "开局星芒增益预设",
+            "label": "开局星光加成",
             "default_case": "LevelPlusPlus",
             "cases": [
                 {
@@ -2028,7 +2028,7 @@
         },
         "TaskStallTimeoutOption": {
             "type": "select",
-            "label": "页面卡死看门狗重启等待时间",
+            "label": "卡死重启等待时间",
             "default_case": "Sec90",
             "cases": [
                 {
@@ -2079,7 +2079,7 @@
         },
         "PerformanceIntervals": {
             "type": "select",
-            "label": "运行速度与轮询性能档位",
+            "label": "运行速度档位",
             "default_case": "Balanced",
             "cases": [
                 {
@@ -2122,7 +2122,7 @@
         },
         "ShopAdvancedFusing": {
             "type": "select",
-            "label": "商店合成进阶微操",
+            "label": "商店合成进阶设置",
             "default_case": "Standard",
             "cases": [
                 {
@@ -2178,5 +2178,7 @@
                 }
             ]
         }
-    }
+    },
+    "github": "https://github.com/DeconstructedCube/AhabAssistantLimbusCompany-Android",
+    "description": "《边狱公司》日常采光、体力合成与全自动镜牢工具。"
 }

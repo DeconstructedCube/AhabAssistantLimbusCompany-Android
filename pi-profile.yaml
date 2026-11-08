@@ -13,6 +13,7 @@ include:
   - assets/model/**
   - assets/logo/**
   - resource/**
+  - CONTACT
   - LICENSE
 
 exclude:
