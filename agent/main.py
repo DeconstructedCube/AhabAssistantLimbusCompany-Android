@@ -27,8 +27,7 @@ from module.logger.my_log import Logger
 Logger()
 
 from module.automation import auto
-from module.automation.input_handlers.maa_control import MaaControl
-from module.config import cfg
+from module.config import cfg, TeamSetting
 from module.logger import log
 from tasks.base.back_init_menu import back_init_menu
 from tasks.base.make_enkephalin_module import lunacy_to_enkephalin, make_enkephalin_module
@@ -151,8 +150,11 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
                     pass
             cfg.unsaved_set_value(k, val)
 
-    # 镜牢队伍配置映射 (默认写入队伍 '1' 并确保其在激活队列中)
-    team = cfg.config.teams.get("1")
+    # 镜牢队伍配置映射 (优先从 overrides 中读取 team_number，支持全量 1~40 编队)
+    t_num = str(overrides.get("team_number", 1))
+    if t_num not in cfg.config.teams:
+        cfg.config.teams[t_num] = TeamSetting(team_number=int(t_num))
+    team = cfg.config.teams[t_num]
     if team is not None:
         team_keys = [
             "team_system",
@@ -213,39 +215,46 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
                         pass
                 setattr(team, tk, val)
 
-        if "captain_sinner_idx" in overrides and overrides["captain_sinner_idx"] is not None:
-            c_idx = int(overrides["captain_sinner_idx"])
-            if 1 <= c_idx <= 12:
-                # 将选中的队长罪人置顶为 1 顺位（吃额外槽位），其余罪人顺延
+        mode = overrides.get("sinner_order_mode")
+        if mode == "pick":
+            # 逐席位指定 1~7 号主力人选
+            ranks = [
+                int(overrides.get(f"sinner_rank_{r}", 0))
+                for r in range(1, 8)
+                if int(overrides.get(f"sinner_rank_{r}", 0)) > 0
+            ]
+            if ranks:
                 order = [0] * 12
-                order[c_idx - 1] = 1
-                curr_rank = 2
+                curr = 1
+                for s in ranks:
+                    if 1 <= s <= 12 and order[s - 1] == 0:
+                        order[s - 1] = curr
+                        curr += 1
                 for i in range(12):
-                    if i != c_idx - 1:
-                        order[i] = curr_rank
-                        curr_rank += 1
+                    if order[i] == 0:
+                        order[i] = curr
+                        curr += 1
                 team.sinner_order = order
                 team.chosen_sinners = [1] * 12
                 team.sinners_be_select = 12
-            elif all(x == 0 for x in team.sinner_order):
-                team.sinner_order = list(range(1, 13))
-                team.chosen_sinners = [1] * 12
-                team.sinners_be_select = 12
-        elif "sinner_order_str" in overrides and overrides["sinner_order_str"]:
-            order = _parse_sinner_order(str(overrides["sinner_order_str"]))
+        elif mode == "text" or ("sinner_order_str" in overrides and overrides["sinner_order_str"]):
+            order = _parse_sinner_order(str(overrides.get("sinner_order_str", "")))
             team.sinner_order = order
             team.chosen_sinners = [1 if x > 0 else 0 for x in order]
             team.sinners_be_select = sum(team.chosen_sinners)
+        elif mode == "keep":
+            if all(x == 0 for x in team.sinner_order):
+                team.sinner_order = list(range(1, 13))
+                team.chosen_sinners = [1] * 12
+                team.sinners_be_select = 12
         elif all(x == 0 for x in team.sinner_order):
             team.sinner_order = list(range(1, 13))
             team.chosen_sinners = [1] * 12
             team.sinners_be_select = 12
 
-    if not cfg.teams_active_queue:
-        if "opening_bonus_preset" in overrides and overrides["opening_bonus_preset"] is not None:
-            preset_val = int(overrides["opening_bonus_preset"])
-            team.opening_bonus = [preset_val] * 10
-        cfg.set_team_enabled(1, True)
+    active_team_int = int(t_num)
+    if active_team_int not in cfg.teams_active_queue:
+        cfg.set_team_enabled(active_team_int, True)
     else:
         cfg.save()
 
