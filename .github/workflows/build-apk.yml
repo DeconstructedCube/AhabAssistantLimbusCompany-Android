@@ -67,6 +67,33 @@ jobs:
           chmod +x gradlew
           ./gradlew :app:assembleRelease --stacktrace --no-daemon
 
+      - name: Sign Android Release APK with apksigner
+        run: |
+          KEYSTORE="release.keystore"
+          KEY_PASS="aalc123456"
+          keytool -genkeypair -v \
+            -keystore "$KEYSTORE" \
+            -alias "aalc" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass "$KEY_PASS" \
+            -keypass "$KEY_PASS" \
+            -dname "CN=AALC, OU=Ahab, O=ProjectMoon, L=Seoul, ST=Seoul, C=KR"
+
+          APK_FILE=$(find maafwapp/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          echo "Signing $APK_FILE..."
+          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          $BUILD_TOOLS_DIR/apksigner sign \
+            --ks "$KEYSTORE" \
+            --ks-key-alias "aalc" \
+            --ks-pass "pass:$KEY_PASS" \
+            --key-pass "pass:$KEY_PASS" \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            "$APK_FILE"
+          $BUILD_TOOLS_DIR/apksigner verify -v "$APK_FILE"
       - name: Locate and Prepare Output APK
         id: apk-path
         run: |
