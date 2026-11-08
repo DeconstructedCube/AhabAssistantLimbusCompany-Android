@@ -213,13 +213,30 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
                         pass
                 setattr(team, tk, val)
 
-        if "sinner_order_str" in overrides and overrides["sinner_order_str"]:
+        if "captain_sinner_idx" in overrides and overrides["captain_sinner_idx"] is not None:
+            c_idx = int(overrides["captain_sinner_idx"])
+            if 1 <= c_idx <= 12:
+                # 将选中的队长罪人置顶为 1 顺位（吃额外槽位），其余罪人顺延
+                order = [0] * 12
+                order[c_idx - 1] = 1
+                curr_rank = 2
+                for i in range(12):
+                    if i != c_idx - 1:
+                        order[i] = curr_rank
+                        curr_rank += 1
+                team.sinner_order = order
+                team.chosen_sinners = [1] * 12
+                team.sinners_be_select = 12
+            elif all(x == 0 for x in team.sinner_order):
+                team.sinner_order = list(range(1, 13))
+                team.chosen_sinners = [1] * 12
+                team.sinners_be_select = 12
+        elif "sinner_order_str" in overrides and overrides["sinner_order_str"]:
             order = _parse_sinner_order(str(overrides["sinner_order_str"]))
             team.sinner_order = order
             team.chosen_sinners = [1 if x > 0 else 0 for x in order]
             team.sinners_be_select = sum(team.chosen_sinners)
         elif all(x == 0 for x in team.sinner_order):
-            # 若用户尚未配置罪人顺序，默认按 1~12 全选以防空编队卡死
             team.sinner_order = list(range(1, 13))
             team.chosen_sinners = [1] * 12
             team.sinners_be_select = 12

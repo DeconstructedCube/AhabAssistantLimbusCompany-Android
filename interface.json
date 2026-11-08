@@ -213,61 +213,245 @@
             ]
         },
         "ExpCount": {
-            "type": "input",
+            "type": "select",
             "label": "经验本次数",
-            "inputs": [
+            "default_case": "Count1",
+            "cases": [
                 {
-                    "name": "count",
-                    "label": "经验本次数",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "set_EXP_count": "{count}"
+                    "name": "Count1",
+                    "label": "1 次 (每日清体)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_EXP_count": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count2",
+                    "label": "2 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_EXP_count": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count3",
+                    "label": "3 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_EXP_count": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count5",
+                    "label": "5 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_EXP_count": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count10",
+                    "label": "10 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_EXP_count": 10
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "ThreadCount": {
-            "type": "input",
+            "type": "select",
             "label": "纽本次数",
-            "inputs": [
+            "default_case": "Count3",
+            "cases": [
                 {
-                    "name": "count",
-                    "label": "纽本次数",
-                    "default": "3",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "set_thread_count": "{count}"
+                    "name": "Count1",
+                    "label": "1 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_thread_count": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count2",
+                    "label": "2 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_thread_count": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count3",
+                    "label": "3 次 (领满每日加成)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_thread_count": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count5",
+                    "label": "5 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_thread_count": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count7",
+                    "label": "7 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_thread_count": 7
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "DailyTeamNumber": {
-            "type": "input",
-            "label": "日常编队序号",
-            "inputs": [
+            "type": "select",
+            "label": "日常采光编队序号",
+            "default_case": "Team1",
+            "cases": [
                 {
-                    "name": "team_num",
-                    "label": "队伍序号",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "daily_teams": "{team_num}"
+                    "name": "Team1",
+                    "label": "编队 #1 (默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team2",
+                    "label": "编队 #2",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team3",
+                    "label": "编队 #3",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team4",
+                    "label": "编队 #4",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team5",
+                    "label": "编队 #5",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team6",
+                    "label": "编队 #6",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team7",
+                    "label": "编队 #7",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team8",
+                    "label": "编队 #8",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team9",
+                    "label": "编队 #9",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 9
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team10",
+                    "label": "编队 #10",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "daily_teams": 10
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "UseContinuousCombat": {
             "type": "switch",
@@ -283,7 +467,10 @@
                                 "use_continuous_combat": true
                             }
                         }
-                    }
+                    },
+                    "option": [
+                        "ContinuousCombatMax"
+                    ]
                 },
                 {
                     "name": "No",
@@ -535,23 +722,70 @@
             ]
         },
         "MirrorCount": {
-            "type": "input",
-            "label": "镜牢次数",
-            "inputs": [
+            "type": "select",
+            "label": "镜牢执行次数",
+            "default_case": "Count1",
+            "cases": [
                 {
-                    "name": "m_count",
-                    "label": "刷牢次数",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "set_mirror_count": "{m_count}"
+                    "name": "Count1",
+                    "label": "1 次 (默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_mirror_count": 1,
+                                "infinite_dungeons": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count2",
+                    "label": "2 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_mirror_count": 2,
+                                "infinite_dungeons": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count3",
+                    "label": "3 次 (刷满周常)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_mirror_count": 3,
+                                "infinite_dungeons": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Count5",
+                    "label": "5 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "set_mirror_count": 5,
+                                "infinite_dungeons": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "CountInfinite",
+                    "label": "无限刷牢 (9999次)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "infinite_dungeons": true
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "HardMirror": {
             "type": "select",
@@ -996,23 +1230,121 @@
             ]
         },
         "MirrorTeamNumber": {
-            "type": "input",
+            "type": "select",
             "label": "镜牢编队序号",
-            "inputs": [
+            "default_case": "Team1",
+            "cases": [
                 {
-                    "name": "m_team_num",
-                    "label": "队伍序号",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "team_number": "{m_team_num}"
+                    "name": "Team1",
+                    "label": "编队 #1 (默认)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team2",
+                    "label": "编队 #2",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team3",
+                    "label": "编队 #3",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team4",
+                    "label": "编队 #4",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team5",
+                    "label": "编队 #5",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team6",
+                    "label": "编队 #6",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team7",
+                    "label": "编队 #7",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team8",
+                    "label": "编队 #8",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team9",
+                    "label": "编队 #9",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 9
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Team10",
+                    "label": "编队 #10",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "team_number": 10
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "SinnerOrderInput": {
             "type": "input",
@@ -1495,7 +1827,7 @@
                     "option": [
                         "MirrorTeamSystem",
                         "MirrorTeamNumber",
-                        "SinnerOrderInput"
+                        "CaptainSinnerSelect"
                     ],
                     "pipeline_override": {
                         "AALC_ConfigHolder": {
@@ -1736,42 +2068,150 @@
             ]
         },
         "MaxKeywordRefresh": {
-            "type": "input",
-            "label": "商店定向刷新次数上限 (0~5)",
-            "inputs": [
+            "type": "select",
+            "label": "定向刷新上限",
+            "default_case": "Ref_1",
+            "cases": [
                 {
-                    "name": "kr",
-                    "label": "定向刷新次数",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "max_keyword_refresh": "{kr}"
+                    "name": "Ref_0",
+                    "label": "0 次 (不刷新)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_keyword_refresh": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_1",
+                    "label": "1 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_keyword_refresh": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_2",
+                    "label": "2 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_keyword_refresh": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_3",
+                    "label": "3 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_keyword_refresh": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_4",
+                    "label": "4 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_keyword_refresh": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_5",
+                    "label": "5 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_keyword_refresh": 5
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "MaxNormalRefresh": {
-            "type": "input",
-            "label": "商店普通刷新次数上限 (0~5)",
-            "inputs": [
+            "type": "select",
+            "label": "普通刷新上限",
+            "default_case": "Ref_1",
+            "cases": [
                 {
-                    "name": "nr",
-                    "label": "普通刷新次数",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "max_normal_refresh": "{nr}"
+                    "name": "Ref_0",
+                    "label": "0 次 (不刷新)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_normal_refresh": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_1",
+                    "label": "1 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_normal_refresh": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_2",
+                    "label": "2 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_normal_refresh": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_3",
+                    "label": "3 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_normal_refresh": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_4",
+                    "label": "4 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_normal_refresh": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Ref_5",
+                    "label": "5 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "max_normal_refresh": 5
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "AdvancedBattleGroup": {
             "type": "switch",
@@ -1815,6 +2255,226 @@
                 {
                     "name": "Default",
                     "label": "默认策略 (收起)"
+                }
+            ]
+        },
+        "CaptainSinnerSelect": {
+            "type": "select",
+            "label": "出战顺位与首位队长",
+            "description": "首位队长罪人每回合额外获得 1 颗技能槽",
+            "default_case": "DefaultOrder",
+            "cases": [
+                {
+                    "name": "DefaultOrder",
+                    "label": "保持编队原有出战顺序 (推荐·免设置)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_1",
+                    "label": "⭐ 队长: 李箱 (Yi Sang) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_2",
+                    "label": "⭐ 队长: 浮士德 (Faust) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_3",
+                    "label": "⭐ 队长: 堂吉诃德 (Don Quixote) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_4",
+                    "label": "⭐ 队长: 良秀 (Ryoshu) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_5",
+                    "label": "⭐ 队长: 默尔索 (Meursault) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_6",
+                    "label": "⭐ 队长: 鸿璐 (Hong Lu) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_7",
+                    "label": "⭐ 队长: 希斯克利夫 (Heathcliff) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_8",
+                    "label": "⭐ 队长: 以实玛利 (Ishmael) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_9",
+                    "label": "⭐ 队长: 罗佳 (Rodion) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 9
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_10",
+                    "label": "⭐ 队长: 辛克莱 (Sinclair) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 10
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_11",
+                    "label": "⭐ 队长: 奥提斯 (Outis) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 11
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Captain_12",
+                    "label": "⭐ 队长: 格里高尔 (Gregor) (首发吃额外槽)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "captain_sinner_idx": 12
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "CustomManual",
+                    "label": "自定义出战序列 (仅特殊需求)",
+                    "option": [
+                        "SinnerOrderInput"
+                    ]
+                }
+            ]
+        },
+        "ContinuousCombatMax": {
+            "type": "select",
+            "label": "单场连战次数上限",
+            "default_case": "Max3",
+            "cases": [
+                {
+                    "name": "Max1",
+                    "label": "1 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_continuous_combat_select": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Max2",
+                    "label": "2 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_continuous_combat_select": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Max3",
+                    "label": "3 次 (推荐)",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_continuous_combat_select": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Max5",
+                    "label": "5 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_continuous_combat_select": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Max10",
+                    "label": "10 次",
+                    "pipeline_override": {
+                        "AALC_ConfigHolder": {
+                            "attach": {
+                                "use_continuous_combat_select": 10
+                            }
+                        }
+                    }
                 }
             ]
         }
