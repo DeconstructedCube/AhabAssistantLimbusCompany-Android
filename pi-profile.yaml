@@ -12,6 +12,7 @@ include:
   - assets/images/**
   - assets/model/**
   - assets/logo/**
+  - assets/icons/**
   - resource/**
   - CONTACT
   - LICENSE

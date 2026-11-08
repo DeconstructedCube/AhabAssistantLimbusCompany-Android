@@ -53,7 +53,7 @@
             "name": "一键长草",
             "entry": "AALC_FullScriptTask",
             "default_check": true,
-            "description": "依次执行采光、换体、领奖与镜牢。",
+            "description": "按勾选依次执行采光、换体、领奖与镜牢。",
             "option": [
                 "EnableDailyTask",
                 "ExpCount",
@@ -85,16 +85,24 @@
                 "ShopAdvancedFusing",
                 "TaskStallTimeoutOption",
                 "PerformanceIntervals"
-            ]
+            ],
+            "group": [
+                "routine"
+            ],
+            "icon": "assets/icons/drive.png"
         },
         {
             "name": "启动游戏至大厅",
             "entry": "AALC_StartAndBackHome",
             "default_check": false,
-            "description": "启动游戏、点击标题进入并关闭活动弹窗。",
+            "description": "冷启动游戏、点击标题进入并关闭活动弹窗。",
             "option": [
                 "SkipEnkephalin"
-            ]
+            ],
+            "group": [
+                "routine"
+            ],
+            "icon": "assets/icons/window.png"
         },
         {
             "name": "脑啡肽换体",
@@ -105,13 +113,17 @@
                 "EnableBuyEnkephalin",
                 "LunacyToEnkephalinTimes",
                 "DrGrandetMode"
-            ]
+            ],
+            "group": [
+                "routine"
+            ],
+            "icon": "assets/icons/enkephalin.png"
         },
         {
             "name": "经验采光",
             "entry": "AALC_ExpLuxcavationTask",
             "default_check": false,
-            "description": "自动进入并完成经验本。",
+            "description": "自动进入并完成经验本采光。",
             "option": [
                 "ExpCount",
                 "DailyTeamNumber",
@@ -119,13 +131,17 @@
                 "UseContinuousCombat",
                 "ContinuousCombatMax",
                 "TargetedTeamingEXP"
-            ]
+            ],
+            "group": [
+                "routine"
+            ],
+            "icon": "assets/icons/exp.png"
         },
         {
             "name": "纽本采光",
             "entry": "AALC_ThreadLuxcavationTask",
             "default_check": false,
-            "description": "自动进入并完成纽本。",
+            "description": "自动进入并完成纽本采光。",
             "option": [
                 "ThreadCount",
                 "DailyTeamNumber",
@@ -133,7 +149,11 @@
                 "UseContinuousCombat",
                 "ContinuousCombatMax",
                 "TargetedTeamingThread"
-            ]
+            ],
+            "group": [
+                "routine"
+            ],
+            "icon": "assets/icons/thread.png"
         },
         {
             "name": "领取奖励",
@@ -142,7 +162,11 @@
             "description": "领取通行证任务经验与邮箱附件。",
             "option": [
                 "GetPrizeMode"
-            ]
+            ],
+            "group": [
+                "routine"
+            ],
+            "icon": "assets/icons/mail.png"
         },
         {
             "name": "自动镜牢",
@@ -189,18 +213,11 @@
                 "ShopAdvancedFusing",
                 "TaskStallTimeoutOption",
                 "PerformanceIntervals"
-            ]
-        },
-        {
-            "name": "自动战斗代打",
-            "entry": "AALC_InfiniteBattleTool",
-            "default_check": false,
-            "description": "战斗中自动拼刀与选技能。",
-            "option": [
-                "ToolInfiniteDefense",
-                "ToolDefenseTurn1",
-                "ToolHandleEvents"
-            ]
+            ],
+            "group": [
+                "mirror"
+            ],
+            "icon": "assets/icons/mirror.png"
         },
         {
             "name": "定时换饼",
@@ -210,7 +227,11 @@
             "option": [
                 "ToolKillGameWaiting",
                 "ToolProductionCycles"
-            ]
+            ],
+            "group": [
+                "utility"
+            ],
+            "icon": "assets/icons/enkephalin.png"
         }
     ],
     "option": {
@@ -1840,93 +1861,6 @@
                 }
             }
         },
-        "ToolInfiniteDefense": {
-            "type": "switch",
-            "label": "全程守备",
-            "default_case": "No",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "开启",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "tool_infinite_defense": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "关闭",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "tool_infinite_defense": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "ToolDefenseTurn1": {
-            "type": "switch",
-            "label": "仅第 1 回合守备",
-            "default_case": "No",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "开启",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "tool_defense_turn1": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "关闭",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "tool_defense_turn1": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "ToolHandleEvents": {
-            "type": "switch",
-            "label": "自动处理判定事件",
-            "default_case": "Yes",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "自动处理",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "tool_handle_events": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "不处理",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "tool_handle_events": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
         "ToolKillGameWaiting": {
             "type": "switch",
             "label": "等待期间关闭游戏",
@@ -2181,116 +2115,21 @@
     },
     "github": "https://github.com/DeconstructedCube/AhabAssistantLimbusCompany-Android",
     "description": "《边狱公司》日常采光、体力合成与全自动镜牢工具。",
-    "preset": [
+    "group": [
         {
-            "name": "每日清体 (采光+领奖)",
-            "label": "每日清体 (采光+领奖)",
-            "description": "自动执行 1 次经验本 + 3 次纽本采光，并领取日常与通行证奖励。",
-            "task": [
-                {
-                    "name": "一键长草",
-                    "enabled": true,
-                    "option": {
-                        "EnableDailyTask": "Yes",
-                        "ExpCount": "1",
-                        "ThreadCount": "3",
-                        "EnableGetReward": "Yes",
-                        "GetPrizeMode": "Both",
-                        "EnableBuyEnkephalin": "No",
-                        "EnableMirrorInFull": "No"
-                    }
-                }
-            ]
+            "name": "routine",
+            "label": "日常长草",
+            "default_expand": true
         },
         {
-            "name": "自动镜牢 (火队·烧伤)",
-            "label": "自动镜牢 (火队·烧伤)",
-            "description": "主体系: 烧伤 | 商店: 四级优先+保护本体系 | 开局: 全选++ | 初始饰品: 123",
-            "task": [
-                {
-                    "name": "自动镜牢",
-                    "enabled": true,
-                    "option": {
-                        "MirrorTeamSystem": "Burn",
-                        "MirrorShopStrategy": "FuseLevelIV",
-                        "ShopAdvancedFusing": "AggressiveWithSave",
-                        "OpeningBonusPreset": "LevelPlusPlus",
-                        "OpeningItemsOrder": "Order123",
-                        "AvoidSkill3": "No",
-                        "PrioritizeSkill3": "No"
-                    }
-                }
-            ]
+            "name": "mirror",
+            "label": "自动镜牢",
+            "default_expand": true
         },
         {
-            "name": "自动镜牢 (流血队·避开白棉花)",
-            "label": "自动镜牢 (流血队·避开白棉花)",
-            "description": "主体系: 流血 | 自动避开白棉花 | 商店: 普通合成 | 开局: 全选++",
-            "task": [
-                {
-                    "name": "自动镜牢",
-                    "enabled": true,
-                    "option": {
-                        "MirrorTeamSystem": "Bleed",
-                        "NotSkipWhiteGossypium": "No",
-                        "MirrorShopStrategy": "FuseNormal",
-                        "ShopAdvancedFusing": "Standard",
-                        "OpeningBonusPreset": "LevelPlusPlus",
-                        "OpeningItemsOrder": "Order123"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "自动镜牢 (沉沦队·四级优先)",
-            "label": "自动镜牢 (沉沦队·四级优先)",
-            "description": "主体系: 沉沦 | 商店: 四级优先 | 开局: 全选++",
-            "task": [
-                {
-                    "name": "自动镜牢",
-                    "enabled": true,
-                    "option": {
-                        "MirrorTeamSystem": "Sinking",
-                        "MirrorShopStrategy": "FuseLevelIV",
-                        "ShopAdvancedFusing": "AggressiveWithSave",
-                        "OpeningBonusPreset": "LevelPlusPlus"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "自动镜牢 (充能队·四级优先)",
-            "label": "自动镜牢 (充能队·四级优先)",
-            "description": "主体系: 充能 | 商店: 四级优先 | 开局: 全选++",
-            "task": [
-                {
-                    "name": "自动镜牢",
-                    "enabled": true,
-                    "option": {
-                        "MirrorTeamSystem": "Charge",
-                        "MirrorShopStrategy": "FuseLevelIV",
-                        "ShopAdvancedFusing": "AggressiveWithSave",
-                        "OpeningBonusPreset": "LevelPlusPlus"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "自动镜牢 (呼吸队·剑契体系)",
-            "label": "自动镜牢 (呼吸队·剑契体系)",
-            "description": "主体系: 呼吸 | 商店: 四级优先 | 开局: 全选++",
-            "task": [
-                {
-                    "name": "自动镜牢",
-                    "enabled": true,
-                    "option": {
-                        "MirrorTeamSystem": "Poise",
-                        "MirrorShopStrategy": "FuseLevelIV",
-                        "ShopAdvancedFusing": "AggressiveWithSave",
-                        "OpeningBonusPreset": "LevelPlusPlus"
-                    }
-                }
-            ]
+            "name": "utility",
+            "label": "便民工具",
+            "default_expand": false
         }
     ]
 }

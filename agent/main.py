@@ -35,8 +35,6 @@ from tasks.base.make_enkephalin_module import lunacy_to_enkephalin, make_enkepha
 from tasks.base.retry_monitor import retry_monitor
 from tasks.base.script_task_scheme import (
     Buy_enkephalin,
-    Daily_task_wrapper,
-    InfiniteBattle_task,
     Mirror_task,
     ProductionModule_task,
      _batch_combat,
@@ -333,13 +331,6 @@ def execute_aalc_task(task_type: str, params: dict[str, Any]) -> bool:
         finally:
             retry_monitor.stop()
             auto.clear_img_cache()
-
-    if task_type == "infinite_battle_tool":
-        return InfiniteBattle_task(
-            defense=bool(params.get("tool_infinite_defense", False)),
-            defense_on_turn1=bool(params.get("tool_defense_turn1", False)),
-            choice_event_handling=bool(params.get("tool_handle_events", True)),
-        )
 
     if task_type == "production_module_tool":
         return ProductionModule_task(

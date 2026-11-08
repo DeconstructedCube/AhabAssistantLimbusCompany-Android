@@ -137,14 +137,6 @@
             "task_type": "mirror_dungeon"
         }
     },
-    "AALC_InfiniteBattleTool": {
-        "recognition": "DirectHit",
-        "action": "Custom",
-        "custom_action": "AALCRunTask",
-        "custom_action_param": {
-            "task_type": "infinite_battle_tool"
-        }
-    },
     "AALC_ProductionModuleTool": {
         "recognition": "DirectHit",
         "action": "Custom",
