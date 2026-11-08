@@ -59,9 +59,6 @@
                 "ExpCount",
                 "ThreadCount",
                 "DailyTeamNumber",
-                "SelectTeamByOrder",
-                "UseContinuousCombat",
-                "ContinuousCombatMax",
                 "EnableGetReward",
                 "GetPrizeMode",
                 "EnableBuyEnkephalin",
@@ -69,22 +66,8 @@
                 "DrGrandetMode",
                 "SkipEnkephalin",
                 "EnableMirrorInFull",
-                "MirrorCount",
-                "HardMirror",
-                "AutoHardMirror",
                 "MirrorTeamSystem",
-                "MirrorTeamNumber",
-                "SinnerOrderInput",
-                "MirrorShopStrategy",
-                "AvoidSkill3",
-                "PrioritizeSkill3",
-                "Floor3Exit",
-                "InfiniteDungeons",
-                "SaveHardRewards",
-                "OpeningBonusPreset",
-                "ShopAdvancedFusing",
-                "TaskStallTimeoutOption",
-                "PerformanceIntervals"
+                "HardMirror"
             ],
             "group": [
                 "routine"
@@ -127,10 +110,7 @@
             "option": [
                 "ExpCount",
                 "DailyTeamNumber",
-                "SelectTeamByOrder",
-                "UseContinuousCombat",
-                "ContinuousCombatMax",
-                "TargetedTeamingEXP"
+                "UseContinuousCombat"
             ],
             "group": [
                 "routine"
@@ -145,10 +125,7 @@
             "option": [
                 "ThreadCount",
                 "DailyTeamNumber",
-                "SelectTeamByOrder",
-                "UseContinuousCombat",
-                "ContinuousCombatMax",
-                "TargetedTeamingThread"
+                "UseContinuousCombat"
             ],
             "group": [
                 "routine"
@@ -175,44 +152,18 @@
             "description": "全流程自动运行镜牢。",
             "option": [
                 "MirrorCount",
-                "HardMirror",
-                "AutoHardMirror",
-                "InfiniteDungeons",
-                "Floor3Exit",
-                "SaveHardRewards",
-                "NoWeeklyBonuses",
-                "HardMirrorSingleBonuses",
-                "SelectEventPack",
-                "SkipEventPack",
-                "ReClaimRewards",
-                "NotSkipWhiteGossypium",
-                "FightToLastMan",
-                "SelectTeamByOrder",
-                "MirrorKeyboardNav",
                 "MirrorTeamSystem",
                 "MirrorTeamNumber",
-                "SinnerOrderInput",
+                "HardMirror",
+                "AutoHardMirror",
                 "MirrorShopStrategy",
                 "AfterFuseLevelIV",
-                "ShoppingStrategyOption",
-                "RewardCardPriority",
-                "OpeningItemsOrder",
-                "UseStarlightToCost",
+                "NotSkipWhiteGossypium",
+                "SaveHardRewards",
+                "Floor3Exit",
                 "AvoidSkill3",
                 "PrioritizeSkill3",
-                "DefenseFirstRound",
-                "DefenseForSolo",
-                "ReFormationEachFloor",
-                "NormalToHardFloor",
-                "SecondSystemOption",
-                "SkillReplacementOption",
-                "MaxKeywordRefresh",
-                "MaxNormalRefresh",
-                "UseTeamCodeOption",
-                "OpeningBonusPreset",
-                "ShopAdvancedFusing",
-                "TaskStallTimeoutOption",
-                "PerformanceIntervals"
+                "DefenseFirstRound"
             ],
             "group": [
                 "mirror"
@@ -321,35 +272,6 @@
                 }
             }
         },
-        "SelectTeamByOrder": {
-            "type": "switch",
-            "label": "按列表顺序选队",
-            "default_case": "Yes",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "按位置顺序选队 (推荐)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "select_team_by_order": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "按 TEAMS #N 名称 OCR 选队",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "select_team_by_order": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
         "UseContinuousCombat": {
             "type": "switch",
             "label": "连续战斗",
@@ -373,83 +295,6 @@
                         "AALC_ConfigHolder": {
                             "attach": {
                                 "use_continuous_combat": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "ContinuousCombatMax": {
-            "type": "input",
-            "label": "连战次数上限",
-            "inputs": [
-                {
-                    "name": "max_c",
-                    "label": "单场连战次数",
-                    "default": "3",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "use_continuous_combat_select": "{max_c}"
-                    }
-                }
-            }
-        },
-        "TargetedTeamingEXP": {
-            "type": "switch",
-            "label": "经验本按星期选队",
-            "default_case": "No",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "开启",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "targeted_teaming_EXP": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "关闭",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "targeted_teaming_EXP": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "TargetedTeamingThread": {
-            "type": "switch",
-            "label": "纽本按星期选队",
-            "default_case": "No",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "开启",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "targeted_teaming_thread": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "关闭",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "targeted_teaming_thread": false
                             }
                         }
                     }
@@ -1003,23 +848,12 @@
         },
         "NotSkipWhiteGossypium": {
             "type": "switch",
-            "label": "不跳过白棉花",
-            "default_case": "No",
+            "label": "流血队跳过白棉花",
+            "default_case": "Skip",
             "cases": [
                 {
-                    "name": "Yes",
-                    "label": "不跳过白棉花",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "not_skip_whitegossypium": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "流血队自动跳过白棉花",
+                    "name": "Skip",
+                    "label": "跳过 (推荐防翻车)",
                     "pipeline_override": {
                         "AALC_ConfigHolder": {
                             "attach": {
@@ -1027,75 +861,14 @@
                             }
                         }
                     }
-                }
-            ]
-        },
-        "FightToLastMan": {
-            "type": "switch",
-            "label": "不提前重开 (战斗至全灭)",
-            "default_case": "No",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "战斗到底",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "fight_to_last_man": true
-                            }
-                        }
-                    }
                 },
                 {
-                    "name": "No",
-                    "label": "存活不足5人自动重开",
+                    "name": "Keep",
+                    "label": "不跳过",
                     "pipeline_override": {
                         "AALC_ConfigHolder": {
                             "attach": {
-                                "fight_to_last_man": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "MirrorKeyboardNav": {
-            "type": "select",
-            "label": "寻路操作模式",
-            "default_case": "TouchYOLO",
-            "cases": [
-                {
-                    "name": "TouchYOLO",
-                    "label": "YOLO 路线规划 + 触控拖拽点击 (默认)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "mirror_keyboard_navigation": false,
-                                "mirror_keyboard_simple_pathfinding": false
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "KeyboardNav",
-                    "label": "YOLO 路线规划 + 方向键寻路",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "mirror_keyboard_navigation": true,
-                                "mirror_keyboard_simple_pathfinding": false
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "SimpleUp",
-                    "label": "极简方向键寻路 (始终按↑选首节点)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "mirror_keyboard_navigation": true,
-                                "mirror_keyboard_simple_pathfinding": true
+                                "not_skip_whitegossypium": true
                             }
                         }
                     }
@@ -1364,60 +1137,6 @@
                 }
             ]
         },
-        "ShoppingStrategyOption": {
-            "type": "select",
-            "label": "商店购买偏好",
-            "default_case": "DefaultBuy",
-            "cases": [
-                {
-                    "name": "DefaultBuy",
-                    "label": "默认全买 (回血+素材+本体系)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "shopping_strategy": false
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "OnlyHeal",
-                    "label": "仅购买回血饰品",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "shopping_strategy": true,
-                                "shopping_strategy_select": 0
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "OnlyTier34",
-                    "label": "四级优先时：仅买3-4级饰品",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "shopping_strategy": true,
-                                "shopping_strategy_select": 1
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "OnlySystem",
-                    "label": "仅购买本体系饰品",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "shopping_strategy": true,
-                                "shopping_strategy_select": 2
-                            }
-                        }
-                    }
-                }
-            ]
-        },
         "RewardCardPriority": {
             "type": "select",
             "label": "奖励卡优先级",
@@ -1467,36 +1186,6 @@
                             "attach": {
                                 "reward_cards": true,
                                 "reward_cards_select": 3
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "OpeningItemsOrder": {
-            "type": "select",
-            "label": "初始饰品顺序",
-            "default_case": "Order123",
-            "cases": [
-                {
-                    "name": "Order123",
-                    "label": "1 → 2 → 3 (默认)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "opening_items": false
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "Order321",
-                    "label": "3 → 2 → 1",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "opening_items": true,
-                                "opening_items_select": 5
                             }
                         }
                     }
@@ -1613,347 +1302,6 @@
                         "AALC_ConfigHolder": {
                             "attach": {
                                 "defense_first_round": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "DefenseForSolo": {
-            "type": "switch",
-            "label": "小指良单通献祭队友",
-            "default_case": "No",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "开启",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "defense_for_solo": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "关闭",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "defense_for_solo": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "ReFormationEachFloor": {
-            "type": "switch",
-            "label": "每层首战重新排顺序",
-            "default_case": "No",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "开启",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "re_formation_each_floor": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "关闭",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "re_formation_each_floor": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "NormalToHardFloor": {
-            "type": "select",
-            "label": "中途切困难楼层",
-            "default_case": "Never",
-            "cases": [
-                {
-                    "name": "Never",
-                    "label": "不中途切换 (0)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "normal_to_hard_floor": 0
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "Floor3",
-                    "label": "第 3 层切困难",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "normal_to_hard_floor": 3
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "Floor4",
-                    "label": "第 4 层切困难",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "normal_to_hard_floor": 4
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "SecondSystemOption": {
-            "type": "select",
-            "label": "第二体系辅助",
-            "default_case": "Disabled",
-            "cases": [
-                {
-                    "name": "Disabled",
-                    "label": "不启用第二体系",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "second_system": false
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "PoiseSecond",
-                    "label": "第二体系：呼吸 (Poise)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "second_system": true,
-                                "second_system_select": 4
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "ChargeSecond",
-                    "label": "第二体系：充能 (Charge)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "second_system": true,
-                                "second_system_select": 6
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "SkillReplacementOption": {
-            "type": "select",
-            "label": "技能替换策略",
-            "default_case": "NoReplace",
-            "cases": [
-                {
-                    "name": "NoReplace",
-                    "label": "不替换技能",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "skill_replacement": false
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "FirstSinner1To3",
-                    "label": "配队首位：1技能 → 3技能",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "skill_replacement": true,
-                                "skill_replacement_select": 0,
-                                "skill_replacement_mode": 0
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "AllSelected1To3",
-                    "label": "所有出战罪人：1技能 → 3技能",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "skill_replacement": true,
-                                "skill_replacement_select": 3,
-                                "skill_replacement_mode": 0
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "MaxKeywordRefresh": {
-            "type": "input",
-            "label": "定向刷新上限",
-            "inputs": [
-                {
-                    "name": "kr",
-                    "label": "定向刷新次数",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "max_keyword_refresh": "{kr}"
-                    }
-                }
-            }
-        },
-        "MaxNormalRefresh": {
-            "type": "input",
-            "label": "普通刷新上限",
-            "inputs": [
-                {
-                    "name": "nr",
-                    "label": "普通刷新次数",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "max_normal_refresh": "{nr}"
-                    }
-                }
-            }
-        },
-        "UseTeamCodeOption": {
-            "type": "input",
-            "label": "使用编队码",
-            "inputs": [
-                {
-                    "name": "tcode",
-                    "label": "编队码字符串",
-                    "default": "",
-                    "pipeline_type": "string"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "use_team_code": true,
-                        "team_code": "{tcode}"
-                    }
-                }
-            }
-        },
-        "ToolKillGameWaiting": {
-            "type": "switch",
-            "label": "等待期间关闭游戏",
-            "default_case": "No",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "关闭游戏等待",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "tool_kill_game_waiting": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "保持游戏挂机",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "tool_kill_game_waiting": false
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "ToolProductionCycles": {
-            "type": "input",
-            "label": "循环轮数",
-            "inputs": [
-                {
-                    "name": "p_cycles",
-                    "label": "循环轮数",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AALC_ConfigHolder": {
-                    "attach": {
-                        "tool_production_cycles": "{p_cycles}"
-                    }
-                }
-            }
-        },
-        "OpeningBonusPreset": {
-            "type": "select",
-            "label": "开局星光加成",
-            "default_case": "LevelPlusPlus",
-            "cases": [
-                {
-                    "name": "LevelPlusPlus",
-                    "label": "全选 ++ (加成最高)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "opening_bonus_preset": 3
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "LevelPlus",
-                    "label": "全选 + (中等加成)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "opening_bonus_preset": 2
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "LevelBase",
-                    "label": "全选基础加成 (省星光)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "opening_bonus_preset": 1
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "LevelZero",
-                    "label": "全部不选 (0)",
-                    "pipeline_override": {
-                        "AALC_ConfigHolder": {
-                            "attach": {
-                                "opening_bonus_preset": 0
                             }
                         }
                     }

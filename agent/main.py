@@ -75,12 +75,13 @@ def apply_config_overrides(overrides: dict[str, Any]) -> None:
 
     log.info(f"正在应用任务配置覆盖: {overrides}")
 
-    # 强制启用移动端 1080P 基准
+    # 强制启用移动端 1080P 基准与触控寻路
     cfg.unsaved_set_value("simulator", True)
     cfg.unsaved_set_value("simulator_type", 2)
     cfg.unsaved_set_value("set_win_size", 1080)
-
-    # 顶层配置项直接映射
+    cfg.unsaved_set_value("mirror_keyboard_navigation", False)
+    cfg.unsaved_set_value("mirror_keyboard_simple_pathfinding", False)
+    cfg.unsaved_set_value("select_team_by_order", True)
     top_level_keys = [
         "daily_task",
         "set_EXP_count",
