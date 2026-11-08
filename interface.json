@@ -37,7 +37,7 @@
       "name": "Default",
       "label": "默认资源",
       "path": [
-        "{PROJECT_DIR}/resource/base"
+        "resource/base"
       ]
     }
   ],
@@ -45,7 +45,7 @@
     "child_exec": "python3",
     "child_args": [
       "-u",
-      "{PROJECT_DIR}/agent/main.py"
+      "agent/main.py"
     ]
   },
   "task": [
