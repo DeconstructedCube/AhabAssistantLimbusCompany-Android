@@ -2,9 +2,10 @@ import heapq
 import time
 from enum import Enum
 from time import sleep
-
-import cv2
-
+try:
+    import cv2
+except ImportError:
+    from utils.image_utils import cv2
 from module.automation import auto
 from module.config import cfg
 from module.logger import log

@@ -1,6 +1,8 @@
 import time
-
-import cv2
+try:
+    import cv2
+except ImportError:
+    from utils.image_utils import cv2
 import numpy as np
 from PIL import Image
 

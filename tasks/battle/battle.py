@@ -4,8 +4,10 @@ import time
 from dataclasses import dataclass
 from time import sleep
 from typing import Callable, Optional
-
-import cv2
+try:
+    import cv2
+except ImportError:
+    from utils.image_utils import cv2
 import numpy as np
 
 from module.automation import auto

@@ -3,10 +3,14 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
-
-import cv2
+try:
+    import cv2
+    from cv2 import createCLAHE
+except ImportError:
+    import utils.image_utils as _img_utils
+    cv2 = _img_utils.cv2
+    createCLAHE = _img_utils.createCLAHE
 import numpy as np
-from cv2 import createCLAHE
 from PIL import Image
 
 from utils.singletonmeta import SingletonMeta

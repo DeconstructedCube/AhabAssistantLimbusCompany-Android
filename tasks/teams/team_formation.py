@@ -195,9 +195,11 @@ def select_battle_team(num):
 
 
 def deal_with_spills():
-    import cv2
+    try:
+        import cv2
+    except ImportError:
+        from utils.image_utils import cv2
     import numpy as np
-
     from module.ocr import ocr
     from utils.image_utils import ImageUtils
 

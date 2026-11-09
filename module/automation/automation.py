@@ -7,8 +7,10 @@ import time
 from ast import List
 from dataclasses import dataclass
 from typing import Any
-
-import cv2
+try:
+    import cv2
+except ImportError:
+    from utils.image_utils import cv2
 import numpy as np
 try:
     import psutil

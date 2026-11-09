@@ -1,5 +1,8 @@
 import os
 
+import numpy as np
+from PIL import Image
+
 try:
     import cv2
     from cv2 import createCLAHE
@@ -10,8 +13,8 @@ except ImportError:
 
     def createCLAHE(*args, **kwargs):
         return _FakeCLAHE()
-
     class _MiniCv2Fallback:
+        createCLAHE = staticmethod(createCLAHE)
         INTER_AREA = 3
         INTER_LINEAR = 1
         TM_CCOEFF_NORMED = 5
@@ -105,8 +108,6 @@ except ImportError:
             return corr
 
     cv2 = _MiniCv2Fallback()
-from PIL import Image
-
 from module.config import cfg
 from module.logger import log
 from utils.path_manager import path_manager

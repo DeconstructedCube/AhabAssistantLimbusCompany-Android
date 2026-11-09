@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: E402
 """
 AALC (AhabAssistantLimbusCompany) — MaaFramework Agent 服务端与 Android 原生 CLI 统一入口。
 
@@ -22,6 +23,25 @@ os.chdir(PROJECT_ROOT)
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+# 针对 Python 3.13 zipimport 不支持无 __init__.py 命名空间包的兼容垫片
+if "ruamel" not in sys.modules:
+    try:
+        import ruamel  # noqa: F401
+    except ModuleNotFoundError:
+        import types
+        _ruamel_mod = types.ModuleType("ruamel")
+        _ruamel_mod.__path__ = [p + "/ruamel" for p in sys.path]
+        _ruamel_mod.__package__ = "ruamel"
+        sys.modules["ruamel"] = _ruamel_mod
+
+# 针对无 C 扩展 cv2 的安卓内嵌运行时自动回退到 MiniCv2Fallback
+if "cv2" not in sys.modules:
+    try:
+        import cv2  # noqa: F401
+    except ImportError:
+        import utils.image_utils as _img_utils
+        setattr(_img_utils.cv2, "createCLAHE", _img_utils.createCLAHE)
+        sys.modules["cv2"] = _img_utils.cv2
 from module.logger.my_log import Logger
 
 Logger()
