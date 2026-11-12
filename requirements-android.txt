@@ -1,3 +1,7 @@
+opencv-python-headless
+onnxruntime
+pydantic
+pydantic-core
 pillow==11.0.0
 ruamel.yaml==0.18.10
 colorlog==6.9.0

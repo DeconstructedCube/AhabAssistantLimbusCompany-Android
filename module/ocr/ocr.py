@@ -3,14 +3,10 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
-try:
-    import cv2
-    from cv2 import createCLAHE
-except ImportError:
-    import utils.image_utils as _img_utils
-    cv2 = _img_utils.cv2
-    createCLAHE = _img_utils.createCLAHE
+
+import cv2
 import numpy as np
+from cv2 import createCLAHE
 from PIL import Image
 
 from utils.singletonmeta import SingletonMeta
@@ -111,7 +107,7 @@ class _PureOnnxPPOCRv4:
         crop_h = int(max(np.linalg.norm(points[0] - points[3]), np.linalg.norm(points[1] - points[2])))
         crop_w = max(crop_w, 1)
         crop_h = max(crop_h, 1)
-        pts_std = np.float32([[0, 0], [crop_w, 0], [crop_w, crop_h], [0, crop_h]])
+        pts_std = np.array([[0, 0], [crop_w, 0], [crop_w, crop_h], [0, crop_h]], dtype=np.float32)
         M = cv2.getPerspectiveTransform(points, pts_std)
         dst = cv2.warpPerspective(img, M, (crop_w, crop_h), borderMode=cv2.BORDER_REPLICATE, flags=cv2.INTER_CUBIC)
         if dst.shape[0] * 1.0 / dst.shape[1] >= 1.5:

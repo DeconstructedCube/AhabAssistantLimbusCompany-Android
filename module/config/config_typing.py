@@ -1,61 +1,10 @@
-import copy
 from typing import List, Optional
 
-try:
-    from pydantic import BaseModel, field_validator, ValidationError
-except ImportError:
-    class ValidationError(Exception):
-        pass
+from pydantic import BaseModel, ValidationError, field_validator
 
-    def field_validator(*args, **kwargs):
-        def decorator(fn):
-            return fn
-        return decorator
+__all__ = ["BaseModel", "ConfigModel", "TeamSetting", "ValidationError", "field_validator"]
 
-    class BaseModel:
-        """纯 Python 零依赖 BaseModel 兼容垫片（在缺少 pydantic-core/Rust 扩展的 Android 环境下 100% 稳定运行）"""
 
-        def __init__(self, **data):
-            for k, v in self._get_class_defaults().items():
-                setattr(self, k, copy.deepcopy(v))
-            for k, v in data.items():
-                setattr(self, k, v)
-
-        @classmethod
-        def _get_class_defaults(cls):
-            defaults = {}
-            for base in reversed(cls.__mro__):
-                for k, v in base.__dict__.items():
-                    if (
-                        not k.startswith("_")
-                        and not callable(v)
-                        and not isinstance(v, (classmethod, staticmethod, property))
-                    ):
-                        defaults[k] = v
-            return defaults
-
-        def model_dump(self) -> dict:
-            res = {}
-            for k in self._get_class_defaults():
-                val = getattr(self, k, None)
-                if isinstance(val, BaseModel):
-                    res[k] = val.model_dump()
-                elif isinstance(val, dict):
-                    res[k] = {
-                        dk: (dv.model_dump() if isinstance(dv, BaseModel) else copy.deepcopy(dv))
-                        for dk, dv in val.items()
-                    }
-                elif isinstance(val, (list, tuple, set)):
-                    res[k] = [
-                        item.model_dump() if isinstance(item, BaseModel) else copy.deepcopy(item)
-                        for item in val
-                    ]
-                else:
-                    res[k] = copy.deepcopy(val)
-            return res
-
-        def model_copy(self, deep: bool = True):
-            return copy.deepcopy(self) if deep else copy.copy(self)
 class TeamSetting(BaseModel):
     """单个队伍设置"""
 

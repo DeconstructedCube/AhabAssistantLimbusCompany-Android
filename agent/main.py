@@ -34,14 +34,6 @@ if "ruamel" not in sys.modules:
         _ruamel_mod.__package__ = "ruamel"
         sys.modules["ruamel"] = _ruamel_mod
 
-# 针对无 C 扩展 cv2 的安卓内嵌运行时自动回退到 MiniCv2Fallback
-if "cv2" not in sys.modules:
-    try:
-        import cv2  # noqa: F401
-    except ImportError:
-        import utils.image_utils as _img_utils
-        setattr(_img_utils.cv2, "createCLAHE", _img_utils.createCLAHE)
-        sys.modules["cv2"] = _img_utils.cv2
 from module.logger.my_log import Logger
 
 Logger()
@@ -50,6 +42,7 @@ from module.automation import auto
 from module.automation.input_handlers.maa_control import MaaControl
 from module.config import TeamSetting, cfg
 from module.logger import log
+from module.my_error.my_error import userStopError
 from tasks import all_systems
 from tasks.base.back_init_menu import back_init_menu
 from tasks.base.make_enkephalin_module import lunacy_to_enkephalin, make_enkephalin_module
@@ -524,10 +517,14 @@ def run_maa_agent_server(socket_id: str) -> None:
                 task_type = merged_params.get("task_type", "full_script")
                 log.info(f"[MaaAgent] 开始执行 AALC 任务: {task_type} (node={argv.node_name})")
                 return execute_aalc_task(task_type, merged_params)
+            except userStopError:
+                log.info("[MaaAgent] 用户主动停止了当前任务")
+                return False
             except Exception as e:
                 log.exception(f"[MaaAgent] 执行任务异常: {e}")
                 return False
-
+            finally:
+                retry_monitor.stop()
     log.info(f"[MaaAgent] 正在启动 AgentServer, socket_id={socket_id}")
     AgentServer.start_up(socket_id)
     AgentServer.join()

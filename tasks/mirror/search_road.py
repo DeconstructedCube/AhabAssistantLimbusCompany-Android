@@ -2,10 +2,9 @@ import heapq
 import time
 from enum import Enum
 from time import sleep
-try:
-    import cv2
-except ImportError:
-    from utils.image_utils import cv2
+
+import cv2
+
 from module.automation import auto
 from module.config import cfg
 from module.logger import log
@@ -410,44 +409,26 @@ def search_road_from_road_map(hard_mode=False):
 _yolo_node_session = None
 
 
-class _Cv2DnnSessionAdapter:
-    class _InputMeta:
-        name = "images"
-
-    def __init__(self, model_path: str):
-        self._net = cv2.dnn.readNetFromONNX(model_path)
-
-    def get_inputs(self):
-        return [self._InputMeta()]
-
-    def run(self, _, feed_dict):
-        blob = next(iter(feed_dict.values()))
-        self._net.setInput(blob)
-        return [self._net.forward()]
-
 
 def _get_yolo_node_session():
     global _yolo_node_session
     if _yolo_node_session is None:
-        try:
-            import onnxruntime as ort
+        import onnxruntime as ort
 
-            sess_opts = ort.SessionOptions()
-            sess_opts.intra_op_num_threads = 4
-            sess_opts.inter_op_num_threads = 2
-            sess_opts.enable_cpu_mem_arena = False
-            avail = ort.get_available_providers()
-            providers = []
-            if "XnnpackExecutionProvider" in avail:
-                providers.append(("XnnpackExecutionProvider", {"intra_op_num_threads": "4"}))
-            providers.append("CPUExecutionProvider")
-            _yolo_node_session = ort.InferenceSession(
-                "./assets/model/best.onnx",
-                sess_options=sess_opts,
-                providers=providers,
-            )
-        except ImportError:
-            _yolo_node_session = _Cv2DnnSessionAdapter("./assets/model/best.onnx")
+        sess_opts = ort.SessionOptions()
+        sess_opts.intra_op_num_threads = 4
+        sess_opts.inter_op_num_threads = 2
+        sess_opts.enable_cpu_mem_arena = False
+        avail = ort.get_available_providers()
+        providers = []
+        if "XnnpackExecutionProvider" in avail:
+            providers.append(("XnnpackExecutionProvider", {"intra_op_num_threads": "4"}))
+        providers.append("CPUExecutionProvider")
+        _yolo_node_session = ort.InferenceSession(
+            "./assets/model/best.onnx",
+            sess_options=sess_opts,
+            providers=providers,
+        )
     return _yolo_node_session
 
 def identify_nodes(bus_x):

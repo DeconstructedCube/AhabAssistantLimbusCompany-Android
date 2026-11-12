@@ -7,17 +7,17 @@ import time
 from ast import List
 from dataclasses import dataclass
 from typing import Any
-try:
-    import cv2
-except ImportError:
-    from utils.image_utils import cv2
+
+import cv2
 import numpy as np
+
 try:
     import psutil
 except ImportError:
     psutil = None
 from PIL.Image import Image
 
+from module.my_error.my_error import userStopError
 from utils.image_utils import ImageUtils
 from utils.path_manager import path_manager
 from utils.singletonmeta import SingletonMeta
@@ -380,8 +380,8 @@ class Automation(metaclass=SingletonMeta):
                     self.screenshot = result
                     self.last_screenshot_time = time.time()
                     return result
-                else:
-                    return None
+            except userStopError:
+                raise
             except Exception as e:
                 log.error(f"截图失败:{e}")
             time.sleep(1)

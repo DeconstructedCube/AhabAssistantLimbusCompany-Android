@@ -61,7 +61,9 @@ jobs:
             --exclude pillow \
             --require pillow==11.0.0 \
             --extra-index-url https://chaquo.com/pypi-13.1/ \
-            --extra-index-url https://termux-user-repository.github.io/pypi/
+            --extra-index-url https://termux-user-repository.github.io/pypi/ \
+            --extra-index-url https://mobilestudio-androidide.github.io/MobileStudio-AndroidPython/simple/ \
+            --extra-index-url https://ririv.github.io/android-wheels/
           python3 -c "
           import glob, zipfile
           for pz in glob.glob('../agent-dist/**/pure.zip', recursive=True):
@@ -94,18 +96,12 @@ jobs:
           ./gradlew :app:assembleRelease --stacktrace --no-daemon
       - name: Sign Android Release APK with apksigner
         run: |
-          KEYSTORE="release.keystore"
+          KEYSTORE=".github/release.keystore"
           KEY_PASS="aalc123456"
-          keytool -genkeypair -v \
-            -keystore "$KEYSTORE" \
-            -alias "aalc" \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass "$KEY_PASS" \
-            -keypass "$KEY_PASS" \
-            -dname "CN=AALC, OU=Ahab, O=ProjectMoon, L=Seoul, ST=Seoul, C=KR"
-
+          if [ ! -f "$KEYSTORE" ]; then
+            echo "Error: .github/release.keystore must exist in the repository!"
+            exit 1
+          fi
           APK_FILE=$(find maafwapp/app/build/outputs/apk/release -name "*.apk" | head -n 1)
           echo "Signing $APK_FILE..."
           BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)

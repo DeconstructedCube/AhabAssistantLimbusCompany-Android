@@ -6,16 +6,15 @@ import subprocess
 import threading
 from time import sleep
 from typing import Any
-try:
-    import cv2
-except ImportError:
-    from utils.image_utils import cv2
+
+import cv2
 import numpy as np
 
 from module.automation.input_handlers import AbstractInput
 from module.automation.input_handlers.scroll_swipe import build_scroll_swipe_plan
 from module.config import cfg
 from module.logger import log
+from module.my_error.my_error import userStopError
 
 ANDROID_KEY_MAP = {
     "a": 29,
@@ -99,7 +98,7 @@ class MaaControl(AbstractInput):
         self._rish_proc: subprocess.Popen | None = None
         self._rish_lock = threading.Lock()
         self._vd_initialized: bool = False
-
+        self._app_started: bool = False
         # 强制 AALC 内部使用 1080P 模拟器模式基准
         cfg.unsaved_set_value("simulator", True)
         cfg.unsaved_set_value("simulator_type", 2)
@@ -114,6 +113,7 @@ class MaaControl(AbstractInput):
         if cls.connection_device is None:
             return cls(maa_context=context)
         cls.connection_device.maa_context = context
+        cls.connection_device._app_started = False
         cls.connection_device._configure_maa_controller()
         return cls.connection_device
 
@@ -136,6 +136,17 @@ class MaaControl(AbstractInput):
                 log.info(f"MaaFramework 控制器已绑定，设备原始分辨率: {self.raw_width}x{self.raw_height}")
         except Exception as e:
             log.debug(f"配置 MaaFramework 控制器参数时提示: {e}")
+
+    def _check_stopping(self) -> None:
+        if self.maa_context is not None:
+            try:
+                if self.maa_context.tasker.stopping:
+                    raise userStopError("MaaFramework 任务已停止")
+            except userStopError:
+                raise
+            except Exception as e:
+                if "Failed to get controller" in str(e) or "stopping" in str(e).lower():
+                    raise userStopError("MaaFramework 控制器已断开或任务已停止") from e
 
     def _close_rish_shell(self) -> None:
         with self._rish_lock:
@@ -297,11 +308,22 @@ class MaaControl(AbstractInput):
 
     def check_game_alive(self) -> bool:
         if self.maa_context is not None:
-            try:
-                img = self.maa_context.tasker.controller.post_screencap().wait().get()
-                return img is not None and img.size > 0
-            except Exception:
+            self._check_stopping()
+            if not self._app_started:
                 return False
+            try:
+                res = subprocess.run(
+                    ["/system/bin/pidof", LIMBUS_PACKAGE],
+                    stdin=subprocess.DEVNULL,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                if res.returncode == 0 and res.stdout.strip():
+                    return True
+            except Exception:
+                pass
+            return self._app_started
         if os.path.exists(self.rish_path):
             self._ensure_ready()
             out = self._run_rish(f"pidof {LIMBUS_PACKAGE}")
@@ -311,8 +333,10 @@ class MaaControl(AbstractInput):
     def start_game(self) -> None:
         log.info("正在启动边狱巴士 (Limbus Company)...")
         if self.maa_context is not None:
+            self._check_stopping()
             try:
                 self.maa_context.tasker.controller.post_start_app(LIMBUS_PACKAGE).wait()
+                self._app_started = True
                 sleep(5)
                 return
             except Exception as e:
@@ -328,13 +352,13 @@ class MaaControl(AbstractInput):
     def close_current_app(self) -> None:
         log.info("正在关闭边狱巴士...")
         if self.maa_context is not None:
+            self._app_started = False
             try:
                 self.maa_context.tasker.controller.post_stop_app(LIMBUS_PACKAGE).wait()
                 sleep(2)
                 return
             except Exception as e:
                 log.warning(f"MaaController post_stop_app 异常: {e}")
-        if os.path.exists(self.rish_path):
             self._run_rish(f"am force-stop {LIMBUS_PACKAGE}")
             sleep(2)
 
@@ -344,15 +368,20 @@ class MaaControl(AbstractInput):
 
     def screenshot(self) -> np.ndarray:
         if self.maa_context is not None:
-            ctrl = self.maa_context.tasker.controller
-            bgr = ctrl.post_screencap().wait().get()
+            self._check_stopping()
+            try:
+                ctrl = self.maa_context.tasker.controller
+                bgr = ctrl.post_screencap().wait().get()
+            except Exception as e:
+                if "Failed to get controller" in str(e) or getattr(self.maa_context.tasker, "stopping", False):
+                    raise userStopError("MaaFramework 任务已停止") from e
+                raise
             if bgr is None or bgr.size == 0:
                 raise RuntimeError("MaaController post_screencap 返回空图像")
             h, w = bgr.shape[:2]
             if h != 1080 or w != 1920:
                 bgr = cv2.resize(bgr, (1920, 1080), interpolation=cv2.INTER_LINEAR)
             return cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
-
         self._ensure_ready()
         if self.display_id > 0 and os.path.exists(self.rish_path):
             done_file = "/sdcard/Download/.vd_captured_done"
@@ -394,13 +423,13 @@ class MaaControl(AbstractInput):
         return rgb
 
     def mouse_click(self, x, y, times=1, move_back=False) -> bool:
+        self._check_stopping()
         self._ensure_ready()
         rx, ry = self._map_xy(x, y)
         log.debug(f"点击位置:({rx},{ry})", stacklevel=2)
         for _ in range(times):
             if self.maa_context is not None:
                 self.maa_context.tasker.controller.post_click(rx, ry).wait()
-            else:
                 d_flag = f"-d {self.display_id}" if self.display_id > 0 else ""
                 self._run_rish(f"input {d_flag} tap {rx} {ry}")
             if times > 1:
@@ -422,6 +451,7 @@ class MaaControl(AbstractInput):
         return False
 
     def mouse_drag(self, x, y, drag_time=0.1, dx=0, dy=0, move_back=True) -> None:
+        self._check_stopping()
         self._ensure_ready()
         rx1, ry1 = self._map_xy(x, y)
         rx2, ry2 = self._map_xy(x + dx, y + dy)
@@ -471,6 +501,7 @@ class MaaControl(AbstractInput):
         *,
         start_settle_seconds: float = 0.0,
     ) -> None:
+        self._check_stopping()
         self._ensure_ready()
         plan = build_scroll_swipe_plan(x, y, dx=dx, dy=dy, duration=duration)
         if len(plan) <= 1:
@@ -510,6 +541,7 @@ class MaaControl(AbstractInput):
         if len(position) == 1:
             self.mouse_click(position[0][0], position[0][1])
             return
+        self._check_stopping()
         self._ensure_ready()
         interpolated: list[tuple[int, int]] = []
         for idx in range(len(position) - 1):
@@ -547,6 +579,7 @@ class MaaControl(AbstractInput):
         self.wait_pause()
 
     def key_press(self, key: str) -> None:
+        self._check_stopping()
         self._ensure_ready()
         keycode = ANDROID_KEY_MAP.get(key.lower())
         if keycode is None:
@@ -563,6 +596,7 @@ class MaaControl(AbstractInput):
     def input_text(self, text: str) -> None:
         if not text:
             return
+        self._check_stopping()
         self._ensure_ready()
         log.debug(f"输入文本: {text}", stacklevel=2)
         if self.maa_context is not None:
