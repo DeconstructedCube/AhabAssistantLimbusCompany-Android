@@ -58,6 +58,6 @@ agent:
       env:
         PYTHONHOME: "{bundle}/prefix"
         PYTHONPATH: "{bundle}/site-packages/pure.zip:{bundle}/site-packages:."
-        LD_LIBRARY_PATH: "{bundle}/prefix/lib:{bundle}/site-packages/chaquopy/lib:{nativeLibs}"
+        LD_LIBRARY_PATH: "{bundle}/prefix/lib:{bundle}/site-packages/chaquopy/lib:{nativeLibs}:/system/lib64"
         MAAFW_BINARY_PATH: "{nativeLibs}"
         SSL_CERT_FILE: "{bundle}/site-packages/certifi/cacert.pem"

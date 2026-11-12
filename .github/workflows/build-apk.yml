@@ -50,6 +50,7 @@ jobs:
         run: |
           cd maafwapp
           pip install packaging
+          sed -i 's|for api in manifest\["wheelApis"\]:|for api in [28, 24, 21, 16]:|g' scripts/build_agent_bundle.py
           mkdir -p .maafw/download/3.13.15-maafw5.13.0
           gh release download 3.13.15-maafw5.13.0 \
             --repo Aliothmoon/MaaAgentCoreAndroid \
@@ -65,20 +66,7 @@ jobs:
             --extra-index-url https://mobilestudio-androidide.github.io/MobileStudio-AndroidPython/simple/ \
             --extra-index-url https://ririv.github.io/android-wheels/
           python3 -c "
-          import urllib.request, zipfile, io, glob
-
-          wheel_urls = [
-              'https://github.com/MobileStudio-AndroidIDE/MobileStudio-AndroidPython/releases/download/android-arm64-py313-v1/opencv_python_headless-4.11.0-1-cp313-cp313-android_28_arm64_v8a.whl',
-              'https://github.com/MobileStudio-AndroidIDE/MobileStudio-AndroidPython/releases/download/android-arm64-py313-v1/onnxruntime-1.31.0-cp313-cp313-android_28_arm64_v8a.whl',
-              'https://github.com/MobileStudio-AndroidIDE/MobileStudio-AndroidPython/releases/download/android-arm64-py313-v1/pydantic_core-2.50.1-cp313-cp313-android_28_arm64_v8a.whl',
-          ]
-          dest_site = '../agent-dist/arm64-v8a/bundle/site-packages'
-          for url in wheel_urls:
-              print('Installing native wheel:', url.split('/')[-1])
-              with urllib.request.urlopen(url) as r:
-                  with zipfile.ZipFile(io.BytesIO(r.read())) as z:
-                      z.extractall(dest_site)
-
+          import glob, zipfile
           for pz in glob.glob('../agent-dist/**/pure.zip', recursive=True):
               with zipfile.ZipFile(pz, 'a') as z:
                   if 'ruamel/__init__.py' not in z.namelist():
