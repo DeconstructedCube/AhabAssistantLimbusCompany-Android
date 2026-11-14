@@ -466,19 +466,18 @@ class MaaControl(AbstractInput):
         dur_ms = max(100, int(float(drag_time or 0.3) * 1000))
         if self.maa_context is not None:
             with self._ipc_lock:
-                ctrl = self.maa_context.tasker.controller
-                ctrl.post_touch_down(rx1, ry1, contact=0, pressure=1).wait()
+                self.maa_context.tasker.controller.post_touch_down(rx1, ry1, contact=0, pressure=1).wait()
             steps = max(5, dur_ms // 20)
             step_sleep = (dur_ms / 1000.0) / steps
             for i in range(1, steps + 1):
                 cx = int(rx1 + (rx2 - rx1) * i / steps)
                 cy = int(ry1 + (ry2 - ry1) * i / steps)
                 with self._ipc_lock:
-                    ctrl.post_touch_move(cx, cy, contact=0, pressure=1).wait()
+                    self.maa_context.tasker.controller.post_touch_move(cx, cy, contact=0, pressure=1).wait()
                 sleep(step_sleep)
             sleep(max(0.3, float(drag_time or 0.1) * 0.3))
             with self._ipc_lock:
-                ctrl.post_touch_up(contact=0).wait()
+                self.maa_context.tasker.controller.post_touch_up(contact=0).wait()
         else:
             d_flag = f"-d {self.display_id}" if self.display_id > 0 else ""
             self._run_rish(f"input {d_flag} swipe {rx1} {ry1} {rx2} {ry2} {dur_ms}")
@@ -520,10 +519,9 @@ class MaaControl(AbstractInput):
             return
 
         if self.maa_context is not None:
+            sx, sy = self._map_xy(*plan[0][0])
             with self._ipc_lock:
-                ctrl = self.maa_context.tasker.controller
-                sx, sy = self._map_xy(*plan[0][0])
-                ctrl.post_touch_down(sx, sy, contact=0, pressure=1).wait()
+                self.maa_context.tasker.controller.post_touch_down(sx, sy, contact=0, pressure=1).wait()
             if start_settle_seconds > 0:
                 sleep(start_settle_seconds)
             prev_x, prev_y = sx, sy
@@ -535,12 +533,12 @@ class MaaControl(AbstractInput):
                     ix = int(round(prev_x + (tx - prev_x) * s / steps))
                     iy = int(round(prev_y + (ty - prev_y) * s / steps))
                     with self._ipc_lock:
-                        ctrl.post_touch_move(ix, iy, contact=0, pressure=1).wait()
+                        self.maa_context.tasker.controller.post_touch_move(ix, iy, contact=0, pressure=1).wait()
                     sleep(step_sleep)
                 prev_x, prev_y = tx, ty
             sleep(0.12)
             with self._ipc_lock:
-                ctrl.post_touch_up(contact=0).wait()
+                self.maa_context.tasker.controller.post_touch_up(contact=0).wait()
         else:
             rx1, ry1 = self._map_xy(x, y)
             rx2, ry2 = self._map_xy(x + dx, y + dy)
@@ -571,19 +569,18 @@ class MaaControl(AbstractInput):
         interpolated.append(self._map_xy(position[-1][0], position[-1][1]))
 
         if self.maa_context is not None:
+            x0, y0 = interpolated[0]
             with self._ipc_lock:
-                ctrl = self.maa_context.tasker.controller
-                x0, y0 = interpolated[0]
-                ctrl.post_touch_down(x0, y0, contact=0, pressure=1).wait()
+                self.maa_context.tasker.controller.post_touch_down(x0, y0, contact=0, pressure=1).wait()
             sleep(0.02)
             step_delay = max(0.008, float(drag_time or 0.1) / max(len(interpolated), 1))
             for pt in interpolated[1:]:
                 with self._ipc_lock:
-                    ctrl.post_touch_move(pt[0], pt[1], contact=0, pressure=1).wait()
+                    self.maa_context.tasker.controller.post_touch_move(pt[0], pt[1], contact=0, pressure=1).wait()
                 sleep(step_delay)
             sleep(0.2)
             with self._ipc_lock:
-                ctrl.post_touch_up(contact=0).wait()
+                self.maa_context.tasker.controller.post_touch_up(contact=0).wait()
         else:
             d_flag = f"-d {self.display_id}" if self.display_id > 0 else ""
             x0, y0 = interpolated[0]
