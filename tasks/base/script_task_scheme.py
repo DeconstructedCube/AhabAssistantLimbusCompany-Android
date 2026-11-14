@@ -4,45 +4,11 @@ from datetime import datetime
 from threading import Event
 from time import sleep, time
 
-try:
-    import win32api
-    import win32con
-except ImportError:
-    win32api = None
-    win32con = None
-try:
-    from playsound3 import playsound
-except ImportError:
-    playsound = None
-try:
-    from PySide6.QtCore import QT_TRANSLATE_NOOP, QMutex, QThread
-except ImportError:
-    from threading import Lock as _Lock, Thread as _Thread
+import win32api
+import win32con
+from playsound3 import playsound
+from PySide6.QtCore import QT_TRANSLATE_NOOP, QMutex, QThread
 
-    def QT_TRANSLATE_NOOP(context: str, text: str) -> str:
-        return text
-
-    class QMutex:
-        def __init__(self):
-            self._lock = _Lock()
-
-        def lock(self):
-            self._lock.acquire()
-
-        def unlock(self):
-            if self._lock.locked():
-                self._lock.release()
-
-    class QThread(_Thread):
-        def __init__(self, parent=None):
-            super().__init__(daemon=True)
-
-        def terminate(self):
-            pass
-
-        @staticmethod
-        def msleep(ms: int):
-            sleep(ms / 1000.0)
 from app import mediator
 from app.windows_toast import TemplateToast, send_toast
 from module.automation import auto
@@ -136,10 +102,11 @@ def onetime_mir_process(team_setting: TeamSetting, team_num: int):
             return True
         else:
             return False
+    except userStopError:
+        raise
     except Exception as e:
         log.exception(f"镜牢行动出错: {e}")
         return False
-
 
 def to_get_reward():
     if cfg.set_get_prize == 0:
@@ -250,13 +217,9 @@ def _warn_if_game_monitor_hdr_enabled() -> None:
 
 
 def Resonate_with_Ahab():
-    if playsound is None:
-        return
     random_number = random.randint(1, 4)
-    try:
-        playsound(f"assets/audio/This_is_all_your_fault_{random_number}.mp3", block=False)
-    except Exception:
-        pass
+    playsound(f"assets/audio/This_is_all_your_fault_{random_number}.mp3", block=False)
+
 
 def _get_game_rendering_scale() -> int | None:
     """读取非模拟器模式下 Limbus 的渲染比例设置。"""
@@ -366,11 +329,12 @@ def Mirror_task():
                 useful = True
                 break
         if useful is False:
+            log.warning("没有符合当前镜牢难度的可用编队，停止执行镜牢")
             break
 
         if not cfg.teams_active_queue:
+            log.warning("镜牢编队队列为空，停止执行镜牢")
             break
-
         team_num = cfg.teams_active_queue[0]
         team_setting = cfg.config.teams[f"{team_num}"]
         # 如果该队伍固定了用途，且用途不符合当前情况，将队首队伍轮转到队尾
@@ -485,9 +449,7 @@ def script_task() -> None | int:
             log.exception("脚本结束后的操作失败")
 
     if cfg.simulator:
-        from module.automation.input_handlers.maa_control import MaaControl
-
-        if MaaControl.connection_device is not None and cfg.simulator_type == 2:
+        if cfg.simulator_type == 2:
             pass
         elif cfg.simulator_type == 0:
             from module.automation.input_handlers.simulator.mumu_control import (
@@ -556,76 +518,3 @@ class my_script_task(QThread):
                 self.msleep(800)  # 覆盖 WinRT toast 异步归还焦点（延迟约 600ms），再释放防息屏
                 apply_power_keep_awake(False)
             auto.clear_img_cache()
-
-
-def InfiniteBattle_task(
-    defense: bool = False,
-    defense_on_turn1: bool = False,
-    choice_event_handling: bool = True,
-) -> bool:
-    """独立执行『亚哈降神附身代打』（无限自动战斗小工具）"""
-    from tasks.battle.battle import Battle
-
-    init_game()
-    path_manager.initialize_paths(reset_eliminations=False)
-    auto.clear_img_cache()
-    retry_monitor.start()
-    try:
-        tool_battle = Battle(is_tool=True)
-        tool_battle.fight(
-            infinite_battle=True,
-            defense_on_turn1=defense_on_turn1,
-            defense_all_time=defense,
-            choice_event_handling=choice_event_handling,
-        )
-        return True
-    finally:
-        retry_monitor.stop()
-        auto.clear_img_cache()
-
-
-def ProductionModule_task(kill_game_while_waiting: bool = False, max_cycles: int = 1) -> bool:
-    """独立执行『自动换饼小工具』（识别当前体力与回复倒计时并合成模块）"""
-    from tasks.base.make_enkephalin_module import get_current_enkephalin, get_the_timing
-    from tasks.base.retry import kill_game
-
-    cycles = 0
-    while max_cycles <= 0 or cycles < max_cycles:
-        init_game()
-        path_manager.initialize_paths(reset_eliminations=False)
-        auto.clear_img_cache()
-        retry_monitor.start()
-        try:
-            if not back_init_menu(allow_restart=True):
-                log.warning("自动换饼返回主界面失败，重试...")
-                sleep(2)
-                continue
-            make_enkephalin_module(cancel=False, skip=False)
-            for _ in range(10):
-                if auto.find_element("enkephalin/lunacy_assets.png", take_screenshot=True):
-                    break
-                auto.click_element("enkephalin/use_lunacy_assets.png")
-            current_enkephalin = get_current_enkephalin()
-            timing = None
-            for _ in range(15):
-                timing = get_the_timing(return_time=True)
-                if timing:
-                    break
-            auto.mouse_click_blank()
-            if current_enkephalin is not None and current_enkephalin >= 20:
-                make_enkephalin_module(skip=False)
-            cycles += 1
-            if max_cycles > 0 and cycles >= max_cycles:
-                break
-            if current_enkephalin is not None and timing is not None:
-                sleep_time = (20 - current_enkephalin % 20 - 1) * 6 * 60 + timing
-                log.info(f"当前体力: {current_enkephalin}, 距离满20体力还需等待 {sleep_time} 秒")
-                if kill_game_while_waiting:
-                    kill_game()
-                sleep(max(1, sleep_time))
-            else:
-                break
-        finally:
-            retry_monitor.stop()
-            auto.clear_img_cache()
-    return True

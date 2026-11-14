@@ -1,6 +1,7 @@
 import heapq
 import time
 from enum import Enum
+from functools import lru_cache
 from time import sleep
 
 import cv2
@@ -405,32 +406,25 @@ def search_road_from_road_map(hard_mode=False):
 # battle 是常规遭遇战，boss_battle 是 Boss 战，event 是事件，focused_encounter 是集中遭遇战（链式战）
 # risky_encounter 是精锐遭遇战（链式战），shop 是商店，abnormality_focused_encounter 是异想体集中遭遇战
 
+@lru_cache(maxsize=1)
+def _get_ort_session():
+    """缓存 ONNX 推理会话，模型全进程只加载一次。"""
+    import onnxruntime as ort
 
-_yolo_node_session = None
-
-
-
-def _get_yolo_node_session():
-    global _yolo_node_session
-    if _yolo_node_session is None:
-        import onnxruntime as ort
-
-        sess_opts = ort.SessionOptions()
-        sess_opts.intra_op_num_threads = 4
-        sess_opts.inter_op_num_threads = 2
-        sess_opts.enable_cpu_mem_arena = False
-        avail = ort.get_available_providers()
-        providers = []
-        if "XnnpackExecutionProvider" in avail:
-            providers.append(("XnnpackExecutionProvider", {"intra_op_num_threads": "4"}))
-        providers.append("CPUExecutionProvider")
-        _yolo_node_session = ort.InferenceSession(
-            "./assets/model/best.onnx",
-            sess_options=sess_opts,
-            providers=providers,
-        )
-    return _yolo_node_session
-
+    sess_opts = ort.SessionOptions()
+    sess_opts.intra_op_num_threads = 4
+    sess_opts.inter_op_num_threads = 2
+    sess_opts.enable_cpu_mem_arena = False
+    avail = ort.get_available_providers()
+    providers = []
+    if "XnnpackExecutionProvider" in avail:
+        providers.append(("XnnpackExecutionProvider", {"intra_op_num_threads": "4"}))
+    providers.append("CPUExecutionProvider")
+    return ort.InferenceSession(
+        "./assets/model/best.onnx",
+        sess_options=sess_opts,
+        providers=providers,
+    )
 def identify_nodes(bus_x):
     import numpy as np
 
@@ -449,7 +443,7 @@ def identify_nodes(bus_x):
     if auto.take_screenshot(gray=False) is None:
         return None
     original = np.array(auto.screenshot)
-    session = _get_yolo_node_session()
+    session = _get_ort_session()
     height, width = original.shape[:2]
     image_scale = min(model_input_width / width, model_input_height / height)
     resized_width = round(width * image_scale)

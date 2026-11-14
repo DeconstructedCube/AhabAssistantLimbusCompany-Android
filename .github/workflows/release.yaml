@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - V*.*
+      - v*.*
+
+jobs:
+  build:
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      version: ${{ github.ref_name }}
+
+  release:
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@main
+        with:
+          path: release/
+          merge-multiple: true
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          files: |
+            release/*
+          target_commitish: ${{ github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fail_on_unmatched_files: true
+
+      - name: Trigger MirrorChyanUploading
+        shell: bash
+        run: |
+          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release -f tag=${{ github.ref_name }}
+          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note -f tag=${{ github.ref_name }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

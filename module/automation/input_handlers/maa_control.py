@@ -86,6 +86,8 @@ class MaaControl(AbstractInput):
 
     connection_device: "MaaControl | None" = None
 
+    _ipc_lock = threading.RLock()
+
     def __init__(self, maa_context: Any = None, rish_path: str | None = None, use_virtual_display: bool = True):
         super().__init__()
         self.maa_context = maa_context
@@ -126,27 +128,29 @@ class MaaControl(AbstractInput):
     def _configure_maa_controller(self) -> None:
         if self.maa_context is None:
             return
-        try:
-            ctrl = self.maa_context.tasker.controller
-            ctrl.set_screenshot_target_short_side(1080)
-            ctrl.post_screencap().wait()
-            res = ctrl.resolution
-            if res and res[0] > 0 and res[1] > 0:
-                self.raw_width, self.raw_height = int(res[0]), int(res[1])
-                log.info(f"MaaFramework 控制器已绑定，设备原始分辨率: {self.raw_width}x{self.raw_height}")
-        except Exception as e:
-            log.debug(f"配置 MaaFramework 控制器参数时提示: {e}")
+        with self._ipc_lock:
+            try:
+                ctrl = self.maa_context.tasker.controller
+                ctrl.set_screenshot_target_short_side(1080)
+                ctrl.post_screencap().wait()
+                res = ctrl.resolution
+                if res and res[0] > 0 and res[1] > 0:
+                    self.raw_width, self.raw_height = int(res[0]), int(res[1])
+                    log.info(f"MaaFramework 控制器已绑定，设备原始分辨率: {self.raw_width}x{self.raw_height}")
+            except Exception as e:
+                log.debug(f"配置 MaaFramework 控制器参数时提示: {e}")
 
     def _check_stopping(self) -> None:
         if self.maa_context is not None:
-            try:
-                if self.maa_context.tasker.stopping:
-                    raise userStopError("MaaFramework 任务已停止")
-            except userStopError:
-                raise
-            except Exception as e:
-                if "Failed to get controller" in str(e) or "stopping" in str(e).lower():
-                    raise userStopError("MaaFramework 控制器已断开或任务已停止") from e
+            with self._ipc_lock:
+                try:
+                    if self.maa_context.tasker.stopping:
+                        raise userStopError("MaaFramework 任务已停止")
+                except userStopError:
+                    raise
+                except Exception as e:
+                    if "Failed to get controller" in str(e) or "stopping" in str(e).lower():
+                        raise userStopError("MaaFramework 控制器已断开或任务已停止") from e
 
     def _close_rish_shell(self) -> None:
         with self._rish_lock:
@@ -295,12 +299,6 @@ class MaaControl(AbstractInput):
         self._close_rish_shell()
     def _map_xy(self, x: float, y: float) -> tuple[int, int]:
         if self.maa_context is not None:
-            try:
-                res = self.maa_context.tasker.controller.resolution
-                if res and res[0] > 0 and res[1] > 0:
-                    self.raw_width, self.raw_height = int(res[0]), int(res[1])
-            except Exception:
-                pass
             rx = int(round(float(x) * self.raw_width / 1920.0))
             ry = int(round(float(y) * self.raw_height / 1080.0))
             return max(0, min(self.raw_width - 1, rx)), max(0, min(self.raw_height - 1, ry))
@@ -335,13 +333,13 @@ class MaaControl(AbstractInput):
         if self.maa_context is not None:
             self._check_stopping()
             try:
-                self.maa_context.tasker.controller.post_start_app(LIMBUS_PACKAGE).wait()
+                with self._ipc_lock:
+                    self.maa_context.tasker.controller.post_start_app(LIMBUS_PACKAGE).wait()
                 self._app_started = True
                 sleep(5)
                 return
             except Exception as e:
                 log.warning(f"MaaController post_start_app 异常: {e}")
-        if os.path.exists(self.rish_path):
             self._ensure_ready()
             if self.display_id > 0:
                 self._run_rish(f"am start --display {self.display_id} -n {LIMBUS_ACTIVITY}")
@@ -354,7 +352,8 @@ class MaaControl(AbstractInput):
         if self.maa_context is not None:
             self._app_started = False
             try:
-                self.maa_context.tasker.controller.post_stop_app(LIMBUS_PACKAGE).wait()
+                with self._ipc_lock:
+                    self.maa_context.tasker.controller.post_stop_app(LIMBUS_PACKAGE).wait()
                 sleep(2)
                 return
             except Exception as e:
@@ -370,10 +369,17 @@ class MaaControl(AbstractInput):
         if self.maa_context is not None:
             self._check_stopping()
             try:
-                ctrl = self.maa_context.tasker.controller
-                bgr = ctrl.post_screencap().wait().get()
+                with self._ipc_lock:
+                    ctrl = self.maa_context.tasker.controller
+                    bgr = ctrl.post_screencap().wait().get()
             except Exception as e:
-                if "Failed to get controller" in str(e) or getattr(self.maa_context.tasker, "stopping", False):
+                stopping = False
+                try:
+                    with self._ipc_lock:
+                        stopping = bool(getattr(self.maa_context.tasker, "stopping", False))
+                except Exception:
+                    pass
+                if "Failed to get controller" in str(e) or stopping:
                     raise userStopError("MaaFramework 任务已停止") from e
                 raise
             if bgr is None or bgr.size == 0:
@@ -429,7 +435,9 @@ class MaaControl(AbstractInput):
         log.debug(f"点击位置:({rx},{ry})", stacklevel=2)
         for _ in range(times):
             if self.maa_context is not None:
-                self.maa_context.tasker.controller.post_click(rx, ry).wait()
+                with self._ipc_lock:
+                    self.maa_context.tasker.controller.post_click(rx, ry).wait()
+            else:
                 d_flag = f"-d {self.display_id}" if self.display_id > 0 else ""
                 self._run_rish(f"input {d_flag} tap {rx} {ry}")
             if times > 1:
@@ -457,17 +465,20 @@ class MaaControl(AbstractInput):
         rx2, ry2 = self._map_xy(x + dx, y + dy)
         dur_ms = max(100, int(float(drag_time or 0.3) * 1000))
         if self.maa_context is not None:
-            ctrl = self.maa_context.tasker.controller
-            ctrl.post_touch_down(rx1, ry1, contact=0, pressure=1).wait()
+            with self._ipc_lock:
+                ctrl = self.maa_context.tasker.controller
+                ctrl.post_touch_down(rx1, ry1, contact=0, pressure=1).wait()
             steps = max(5, dur_ms // 20)
             step_sleep = (dur_ms / 1000.0) / steps
             for i in range(1, steps + 1):
                 cx = int(rx1 + (rx2 - rx1) * i / steps)
                 cy = int(ry1 + (ry2 - ry1) * i / steps)
-                ctrl.post_touch_move(cx, cy, contact=0, pressure=1).wait()
+                with self._ipc_lock:
+                    ctrl.post_touch_move(cx, cy, contact=0, pressure=1).wait()
                 sleep(step_sleep)
             sleep(max(0.3, float(drag_time or 0.1) * 0.3))
-            ctrl.post_touch_up(contact=0).wait()
+            with self._ipc_lock:
+                ctrl.post_touch_up(contact=0).wait()
         else:
             d_flag = f"-d {self.display_id}" if self.display_id > 0 else ""
             self._run_rish(f"input {d_flag} swipe {rx1} {ry1} {rx2} {ry2} {dur_ms}")
@@ -509,9 +520,10 @@ class MaaControl(AbstractInput):
             return
 
         if self.maa_context is not None:
-            ctrl = self.maa_context.tasker.controller
-            sx, sy = self._map_xy(*plan[0][0])
-            ctrl.post_touch_down(sx, sy, contact=0, pressure=1).wait()
+            with self._ipc_lock:
+                ctrl = self.maa_context.tasker.controller
+                sx, sy = self._map_xy(*plan[0][0])
+                ctrl.post_touch_down(sx, sy, contact=0, pressure=1).wait()
             if start_settle_seconds > 0:
                 sleep(start_settle_seconds)
             prev_x, prev_y = sx, sy
@@ -522,11 +534,13 @@ class MaaControl(AbstractInput):
                 for s in range(1, steps + 1):
                     ix = int(round(prev_x + (tx - prev_x) * s / steps))
                     iy = int(round(prev_y + (ty - prev_y) * s / steps))
-                    ctrl.post_touch_move(ix, iy, contact=0, pressure=1).wait()
+                    with self._ipc_lock:
+                        ctrl.post_touch_move(ix, iy, contact=0, pressure=1).wait()
                     sleep(step_sleep)
                 prev_x, prev_y = tx, ty
             sleep(0.12)
-            ctrl.post_touch_up(contact=0).wait()
+            with self._ipc_lock:
+                ctrl.post_touch_up(contact=0).wait()
         else:
             rx1, ry1 = self._map_xy(x, y)
             rx2, ry2 = self._map_xy(x + dx, y + dy)
@@ -557,16 +571,19 @@ class MaaControl(AbstractInput):
         interpolated.append(self._map_xy(position[-1][0], position[-1][1]))
 
         if self.maa_context is not None:
-            ctrl = self.maa_context.tasker.controller
-            x0, y0 = interpolated[0]
-            ctrl.post_touch_down(x0, y0, contact=0, pressure=1).wait()
+            with self._ipc_lock:
+                ctrl = self.maa_context.tasker.controller
+                x0, y0 = interpolated[0]
+                ctrl.post_touch_down(x0, y0, contact=0, pressure=1).wait()
             sleep(0.02)
             step_delay = max(0.008, float(drag_time or 0.1) / max(len(interpolated), 1))
             for pt in interpolated[1:]:
-                ctrl.post_touch_move(pt[0], pt[1], contact=0, pressure=1).wait()
+                with self._ipc_lock:
+                    ctrl.post_touch_move(pt[0], pt[1], contact=0, pressure=1).wait()
                 sleep(step_delay)
             sleep(0.2)
-            ctrl.post_touch_up(contact=0).wait()
+            with self._ipc_lock:
+                ctrl.post_touch_up(contact=0).wait()
         else:
             d_flag = f"-d {self.display_id}" if self.display_id > 0 else ""
             x0, y0 = interpolated[0]
@@ -585,13 +602,17 @@ class MaaControl(AbstractInput):
         if keycode is None:
             log.warning(f"未知的 Android 按键映射: {key}")
             return
-        log.debug(f"发送按键: {key} (keycode={keycode})", stacklevel=2)
         if self.maa_context is not None:
-            self.maa_context.tasker.controller.post_click_key(keycode).wait()
+            if key.lower() in ("esc", "p", "enter"):
+                log.debug(f"Android 虚拟副屏跳过按键注入: {key}", stacklevel=2)
+                return
+            log.debug(f"发送按键: {key} (keycode={keycode})", stacklevel=2)
+            with self._ipc_lock:
+                self.maa_context.tasker.controller.post_click_key(keycode).wait()
         else:
+            log.debug(f"发送按键: {key} (keycode={keycode})", stacklevel=2)
             d_flag = f"-d {self.display_id}" if self.display_id > 0 else ""
             self._run_rish(f"input {d_flag} keyevent {keycode}")
-        self.wait_pause()
 
     def input_text(self, text: str) -> None:
         if not text:
@@ -600,9 +621,28 @@ class MaaControl(AbstractInput):
         self._ensure_ready()
         log.debug(f"输入文本: {text}", stacklevel=2)
         if self.maa_context is not None:
-            self.maa_context.tasker.controller.post_input_text(text).wait()
+            with self._ipc_lock:
+                self.maa_context.tasker.controller.post_input_text(text).wait()
         else:
             d_flag = f"-d {self.display_id}" if self.display_id > 0 else ""
             safe_text = text.replace("'", "")
             self._run_rish(f"input {d_flag} text '{safe_text}'")
         self.wait_pause()
+
+    def run_ocr_direct(self, bgr_img: np.ndarray, *, only_rec: bool = False) -> list[tuple[str, float, Any]]:
+        if self.maa_context is None:
+            return []
+        from maa.pipeline import JOCR, JRecognitionType
+
+        with self._ipc_lock:
+            detail = self.maa_context.run_recognition_direct(
+                JRecognitionType.OCR,
+                JOCR(only_rec=only_rec),
+                bgr_img,
+            )
+        if detail is None or not detail.all_results:
+            return []
+        return [
+            (getattr(item, "text", ""), float(getattr(item, "score", 0.0)), getattr(item, "box", None))
+            for item in detail.all_results
+        ]

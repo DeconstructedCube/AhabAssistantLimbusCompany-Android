@@ -1,47 +1,4 @@
-try:
-    from PySide6.QtCore import QObject, Signal
-except ImportError:
-    class _BoundSignal:
-        def __init__(self):
-            self._callbacks = []
-
-        def connect(self, callback):
-            if callback not in self._callbacks:
-                self._callbacks.append(callback)
-
-        def disconnect(self, callback=None):
-            if callback is None:
-                self._callbacks.clear()
-            elif callback in self._callbacks:
-                self._callbacks.remove(callback)
-
-        def emit(self, *args, **kwargs):
-            for cb in list(self._callbacks):
-                try:
-                    cb(*args, **kwargs)
-                except Exception:
-                    pass
-
-    class Signal:
-        def __init__(self, *types):
-            self._types = types
-            self._name = ""
-
-        def __set_name__(self, owner, name):
-            self._name = f"_sig_{name}"
-
-        def __get__(self, instance, owner=None):
-            if instance is None:
-                return self
-            sig = getattr(instance, self._name, None)
-            if sig is None:
-                sig = _BoundSignal()
-                setattr(instance, self._name, sig)
-            return sig
-
-    class QObject:
-        def __init__(self, *args, **kwargs):
-            pass
+from PySide6.QtCore import QObject, Signal
 
 
 class Mediator(QObject):

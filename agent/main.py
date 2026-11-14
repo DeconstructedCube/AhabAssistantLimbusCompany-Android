@@ -33,11 +33,17 @@ if "ruamel" not in sys.modules:
         _ruamel_mod.__path__ = [p + "/ruamel" for p in sys.path]
         _ruamel_mod.__package__ = "ruamel"
         sys.modules["ruamel"] = _ruamel_mod
+from agent.android_shims import install_android_shims
+
+install_android_shims()
 
 from module.logger.my_log import Logger
 
 Logger()
 
+from agent.android_ocr import install_android_ocr
+
+install_android_ocr()
 from module.automation import auto
 from module.automation.input_handlers.maa_control import MaaControl
 from module.config import TeamSetting, cfg
@@ -48,9 +54,7 @@ from tasks.base.back_init_menu import back_init_menu
 from tasks.base.make_enkephalin_module import lunacy_to_enkephalin, make_enkephalin_module
 from tasks.base.retry_monitor import retry_monitor
 from tasks.base.script_task_scheme import (
-    InfiniteBattle_task,
     Mirror_task,
-    ProductionModule_task,
     _batch_combat,
     init_game,
     onetime_EXP_process,
@@ -463,19 +467,92 @@ def execute_aalc_task(task_type: str, params: dict[str, Any]) -> bool:
             auto.clear_img_cache()
 
     if task_type == "production_module_tool":
-        return ProductionModule_task(
+        return _run_production_module_tool(
             kill_game_while_waiting=bool(params.get("tool_kill_game_waiting", False)),
             max_cycles=int(params.get("tool_production_cycles", 1)),
         )
 
     if task_type == "infinite_battle_tool":
-        return InfiniteBattle_task(
+        return _run_infinite_battle_tool(
             defense=bool(params.get("tool_infinite_defense", False)),
             defense_on_turn1=bool(params.get("tool_defense_turn1", False)),
             choice_event_handling=bool(params.get("tool_handle_events", True)),
         )
 
     raise ValueError(f"未知的 AALC 任务类型: {task_type}")
+
+
+def _run_infinite_battle_tool(
+    defense: bool = False,
+    defense_on_turn1: bool = False,
+    choice_event_handling: bool = True,
+) -> bool:
+    from tasks.battle.battle import Battle
+
+    init_game()
+    path_manager.initialize_paths(reset_eliminations=False)
+    auto.clear_img_cache()
+    retry_monitor.start()
+    try:
+        tool_battle = Battle(is_tool=True)
+        tool_battle.fight(
+            infinite_battle=True,
+            defense_on_turn1=defense_on_turn1,
+            defense_all_time=defense,
+            choice_event_handling=choice_event_handling,
+        )
+        return True
+    finally:
+        retry_monitor.stop()
+        auto.clear_img_cache()
+
+
+def _run_production_module_tool(kill_game_while_waiting: bool = False, max_cycles: int = 1) -> bool:
+    from time import sleep
+
+    from tasks.base.make_enkephalin_module import get_current_enkephalin, get_the_timing
+    from tasks.base.retry import kill_game
+
+    cycles = 0
+    while max_cycles <= 0 or cycles < max_cycles:
+        init_game()
+        path_manager.initialize_paths(reset_eliminations=False)
+        auto.clear_img_cache()
+        retry_monitor.start()
+        try:
+            if not back_init_menu(allow_restart=True):
+                log.warning("自动换饼返回主界面失败，重试...")
+                sleep(2)
+                continue
+            make_enkephalin_module(cancel=False, skip=False)
+            for _ in range(10):
+                if auto.find_element("enkephalin/lunacy_assets.png", take_screenshot=True):
+                    break
+                auto.click_element("enkephalin/use_lunacy_assets.png")
+            current_enkephalin = get_current_enkephalin()
+            timing = None
+            for _ in range(15):
+                timing = get_the_timing(return_time=True)
+                if timing:
+                    break
+            auto.mouse_click_blank()
+            if current_enkephalin is not None and current_enkephalin >= 20:
+                make_enkephalin_module(skip=False)
+            cycles += 1
+            if max_cycles > 0 and cycles >= max_cycles:
+                break
+            if current_enkephalin is not None and timing is not None:
+                sleep_time = (20 - current_enkephalin % 20 - 1) * 6 * 60 + timing
+                log.info(f"当前体力: {current_enkephalin}, 距离满20体力还需等待 {sleep_time} 秒")
+                if kill_game_while_waiting:
+                    kill_game()
+                sleep(max(1, sleep_time))
+            else:
+                break
+        finally:
+            retry_monitor.stop()
+            auto.clear_img_cache()
+    return True
 
 
 def run_maa_agent_server(socket_id: str) -> None:

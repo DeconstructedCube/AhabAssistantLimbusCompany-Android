@@ -6,15 +6,9 @@ from datetime import datetime, time, timedelta
 from time import sleep
 from zoneinfo import ZoneInfo  # Python 3.9+ 内置模块
 
-try:
-    import cv2
-except ImportError:
-    from utils.image_utils import cv2
+import cv2
 import numpy as np
-try:
-    import win32crypt
-except ImportError:
-    win32crypt = None
+import win32crypt
 
 from module.config import cfg
 from module.logger import log
@@ -136,30 +130,51 @@ def check_teams_order(lst):
 
 
 def encrypt_string(text: str, entropy: bytes = b"AALC") -> str:
-    """使用当前Windows用户凭据加密字符串（非Windows回退Base64）"""
+    """使用当前Windows用户凭据加密字符串"""
+
     if not text:
         return ""
+
+    # 转换为字节
     data = text.encode("utf-8")
-    if win32crypt is None:
-        return base64.b64encode(data).decode("utf-8")
-    encrypted_data = win32crypt.CryptProtectData(data, None, entropy, None, None, 0)
+
+    # 加密数据（只能由同一用户在同一机器上解密）
+    encrypted_data = win32crypt.CryptProtectData(
+        data,
+        None,  # 描述字符串（可选）
+        entropy,  # 额外熵值（增强安全性）
+        None,  # 保留
+        None,  # 提示信息
+        0,  # 默认标志：CRYPTPROTECT_UI_FORBIDDEN
+    )
+    # 返回Base64编码的加密结果
     return base64.b64encode(encrypted_data).decode("utf-8")
 
 
 def decrypt_string(encrypted_b64: str, entropy: bytes = b"AALC") -> str:
-    """使用当前Windows用户凭据解密字符串（非Windows回退Base64）"""
+    """使用当前Windows用户凭据解密字符串"""
     if not encrypted_b64:
         return ""
+
     if len(encrypted_b64) % 4 != 0:
         return encrypted_b64
     try:
+        # 解码Base64
         encrypted_data = base64.b64decode(encrypted_b64)
-        if win32crypt is None:
-            return encrypted_data.decode("utf-8")
-        decrypted_data = win32crypt.CryptUnprotectData(encrypted_data, entropy, None, None, 0)
-        return decrypted_data[1].decode("utf-8")
+
+        # 解密数据
+        decrypted_data = win32crypt.CryptUnprotectData(
+            encrypted_data,
+            entropy,  # 必须与加密时相同的熵值
+            None,  # 保留
+            None,  # 提示信息
+            0,  # 默认标志
+        )
     except Exception:
         return encrypted_b64
+    # 返回原始字符串
+    return decrypted_data[1].decode("utf-8")
+
 
 _game_pid_cache: int | None = None
 
@@ -170,15 +185,16 @@ def check_game_running() -> bool:
 
     if cfg.simulator:
         from module.automation.input_handlers.maa_control import MaaControl
+
         if MaaControl.connection_device is not None:
             return MaaControl.connection_device.check_game_alive()
+        if cfg.simulator_type == 2:
+            return False
         if cfg.simulator_type == 0:
             from module.automation.input_handlers.simulator.mumu_control import (
                 MumuControl,
             )
             return MumuControl.connection_device.check_game_alive()
-        elif cfg.simulator_type == 2:
-            return False
         else:
             # 其他模拟器类型，使用通用的 SimulatorControl 检查
             try:
@@ -191,10 +207,8 @@ def check_game_running() -> bool:
             except Exception:
                 return False
 
-    try:
-        import psutil
-    except ImportError:
-        return False
+    import psutil
+
     if _game_pid_cache is not None:
         try:
             if cfg.game_process_name in psutil.Process(_game_pid_cache).name():

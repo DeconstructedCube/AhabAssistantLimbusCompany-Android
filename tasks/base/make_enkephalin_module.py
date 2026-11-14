@@ -38,11 +38,9 @@ def get_the_timing(return_time=False):
 
 
 def get_current_enkephalin():
-    try:
-        import cv2
-    except ImportError:
-        from utils.image_utils import cv2
+    import cv2
     import numpy as np
+
     from module.ocr import ocr
     from utils.image_utils import ImageUtils
 

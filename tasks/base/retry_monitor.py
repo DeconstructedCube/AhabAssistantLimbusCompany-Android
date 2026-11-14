@@ -1,9 +1,7 @@
 import threading
 import time
-try:
-    import cv2
-except ImportError:
-    from utils.image_utils import cv2
+
+import cv2
 import numpy as np
 
 from module.automation import auto

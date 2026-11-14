@@ -4,10 +4,8 @@ import time
 from dataclasses import dataclass
 from time import sleep
 from typing import Callable, Optional
-try:
-    import cv2
-except ImportError:
-    from utils.image_utils import cv2
+
+import cv2
 import numpy as np
 
 from module.automation import auto
@@ -39,7 +37,7 @@ class Battle:
     def __init__(self, is_tool: bool = False):
         self.first_battle = False
         self.identify_keyword_turn = True
-        self.mouse_click_rate = False
+        self.mouse_click_rate = bool(cfg.simulator)
         self.INIT_CHANCE = 16
         self.running = True  # 用于外部打断战斗逻辑执行
         self.defense_all_time = False
@@ -109,32 +107,6 @@ class Battle:
 
         return new_time
 
-    def _trigger_win_rate_start(self) -> str:
-        """触发胜率(P)+开始战斗(Enter/右侧齿轮)，在移动端/模拟器直接走触控点击避免无效按键延迟。"""
-        my_scale = cfg.set_win_size / 1440
-        if cfg.simulator or self.mouse_click_rate:
-            if pos := auto.find_element("battle/win_rate_card.png", threshold=0.75):
-                auto.mouse_click(pos[0] + 50 * my_scale, pos[1] - 50 * my_scale)
-                auto.click_element("battle/gear_right.png")
-                return "使用触控点击胜率+齿轮开始战斗"
-            if auto.click_element("battle/win_rate_assets.png"):
-                auto.click_element("battle/gear_right.png")
-                return "使用触控点击胜率按钮+齿轮开始战斗"
-
-        auto.key_press("p")
-        sleep(0.5)
-        auto.key_press("enter")
-        if not self.mouse_click_rate:
-            sleep(1)
-            if not auto.find_element("battle/pause_assets.png", threshold=0.75, take_screenshot=True):
-                self.mouse_click_rate = True
-                if pos := auto.find_element("battle/win_rate_card.png", threshold=0.75):
-                    auto.mouse_click(pos[0] + 50 * my_scale, pos[1] - 50 * my_scale)
-                    auto.click_element("battle/gear_right.png")
-            else:
-                self.mouse_click_rate = False
-        return "使用P+Enter开始战斗"
-
     def _battle_operation(
         self,
         first_turn: bool,
@@ -163,10 +135,12 @@ class Battle:
                 msg = "第一回合全员防御，开始战斗"
             if self._defense_this_round() is False:
                 if use_limited_defense:
-                    msg = "小指良单通连续防御失败，本回合改为胜率出招"
+                    msg = "小指良单通连续防御失败，本回合改为P+Enter"
                 else:
-                    msg = "第一回合全员防御失败，本场战斗改为胜率出招"
-                self._trigger_win_rate_start()
+                    msg = "第一回合全员防御失败，本场战斗改为P+Enter"
+                auto.key_press("p")
+                sleep(0.5)
+                auto.key_press("enter")
             elif use_limited_defense:
                 defense_for_solo_state.consume_turn()
                 limited_defense_succeeded = True
@@ -175,7 +149,9 @@ class Battle:
                     log.info("本次镜牢的连续防御已完成，后续回合恢复普通战斗操作")
             sleep(2)
             if not auto.find_element("battle/pause_assets.png", take_screenshot=True):
-                self._trigger_win_rate_start()
+                auto.key_press("p")
+                sleep(0.5)
+                auto.key_press("enter")
         elif self.defense_all_time:
             if auto.find_element("battle/gear_left.png", threshold=0.9):
                 msg = "使用全员防御模式开始战斗"
@@ -187,13 +163,32 @@ class Battle:
             mode_name = "优先" if use_prioritize_skill_3 else "避免"
             msg = f"使用{mode_name}3技能模式开始战斗"
             if self._chain_battle(prioritize_skill_3=use_prioritize_skill_3) is False:
-                msg = f"使用{mode_name}三技能的链接战失败，本场战斗改为胜率出招"
-                self._trigger_win_rate_start()
+                msg = f"使用{mode_name}三技能的链接战失败，本场战斗改为P+Enter"
+                auto.key_press("p")
+                sleep(0.5)
+                auto.key_press("enter")
             sleep(2)
             if not auto.find_element("battle/pause_assets.png", take_screenshot=True):
-                self._trigger_win_rate_start()
+                auto.key_press("p")
+                sleep(0.5)
+                auto.key_press("enter")
         else:
-            msg = self._trigger_win_rate_start()
+            auto.key_press("p")
+            sleep(0.5)
+            auto.key_press("enter")
+            msg = "使用P+Enter开始战斗"
+            if self.mouse_click_rate:
+                my_scale = cfg.set_win_size / 1440
+                if pos := auto.find_element("battle/win_rate_card.png", threshold=0.75):
+                    pos = [pos[0] + 50 * my_scale, pos[1] - 50 * my_scale]
+                    auto.mouse_click(pos[0], pos[1])
+                    auto.click_element("battle/gear_right.png")
+            else:
+                sleep(1)
+                if not auto.find_element("battle/pause_assets.png", threshold=0.75):
+                    self.mouse_click_rate = True
+                else:
+                    self.mouse_click_rate = False
         log.debug(msg)
         return limited_defense_succeeded
 
@@ -674,8 +669,9 @@ class Battle:
             auto.mouse_to_blank()
 
             sleep(0.5)
-            if not cfg.simulator:
-                auto.key_press("enter")
+
+            auto.key_press("enter")
+
             sleep(1)
             return True
         except Exception:
